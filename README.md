@@ -1,535 +1,481 @@
-# 🚀 Sistema de Email Personalizado con CRUD
+# 🚀 Sistema de Email con Comandos CRUD v2.0
 
-Sistema híbrido de emails que permite procesamiento de comandos CRUD via email con dos modalidades: servidor tecnoweb y servidor independiente.
+**Sistema completo de procesamiento de emails con comandos CRUD automático**
 
-## 👨‍💻 Desarrollador
-- **Nombre**: Marco David Toledo
-- **Email**: marcodavidtoledo@gmail.com
+[![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://openjdk.java.net/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13%2B-blue.svg)](https://postgresql.org/)
+[![JavaMail](https://img.shields.io/badge/JavaMail-1.5%2B-green.svg)](https://javaee.github.io/javamail/)
+[![Status](https://img.shields.io/badge/Status-Productivo-brightgreen.svg)]()
 
-## 🔧 Configuración
+---
 
-### Base de Datos Local
+## 📋 **Índice de Documentación**
+
+### **📚 Documentaciones Principales**
+- **[README.md](README.md)** - Esta documentación principal (inicio aquí)
+- **[INSTRUCCIONES_SISTEMA_COMPLETO.md](INSTRUCCIONES_SISTEMA_COMPLETO.md)** - Guía del sistema bidireccional completo
+- **[DEMO_SISTEMA_COMPLETO.md](DEMO_SISTEMA_COMPLETO.md)** - Demostraciones y casos de uso
+- **[README-SERVIDOR-SMTP.md](README-SERVIDOR-SMTP.md)** - Servidor SMTP personalizado
+- **[DIAGRAMA_SECUENCIA.md](DIAGRAMA_SECUENCIA.md)** - Diagramas técnicos y flujos
+
+### **🛠️ Scripts de Desarrollo**
+- **[compile.sh](compile.sh)** - Script de compilación automatizada
+- **[run.sh](run.sh)** - Script de ejecución rápida
+- **[start-smtp-ngrok.sh](start-smtp-ngrok.sh)** - Servidor SMTP con túnel ngrok
+
+### **🗂️ Estructura del Proyecto**
+- **[sql/init_database.sql](sql/init_database.sql)** - Inicialización de base de datos
+- **[lib/](lib/)** - Librerías JavaMail requeridas
+- **[src/main/java/](src/main/java/)** - Código fuente principal
+
+---
+
+## 🎯 **¿Qué hace este sistema?**
+
+Este sistema permite **controlar una base de datos PostgreSQL enviando comandos por email**:
+
+### **✅ Características v2.0**
+- 🤖 **Monitor Gmail en tiempo real** - Detecta emails nuevos cada 10 segundos
+- 📧 **Comandos en ASUNTO y CONTENIDO** - Mayor flexibilidad para usuarios
+- 🔄 **Respuestas como REPLY** - Responde al email original, no crea uno nuevo
+- 📝 **Comandos singulares y plurales** - `usuario`/`usuarios`, `producto`/`productos`
+- 🏷️ **Nombres descriptivos** - Muestra nombres de categoría, no solo IDs
+- 🎨 **Respuestas HTML modernas** - Tablas responsive y diseño profesional
+- 🛡️ **Validación completa** - Autenticación, registro automático, sugerencias de error
+
+### **📧 Comandos Disponibles**
 ```
-Host: localhost
-Puerto: 5432
-Base de datos: EcommerceTool (debe existir previamente)
-Usuario: postgres
-Password: postgres
+• registrar Juan Pérez 123456789 masculino
+• usuario get / usuarios get
+• producto get / productos get  
+• categoria get / categorias get
+• cliente get / clientes get
+• tipo_pago get / tipos_pago get
+• help
 ```
 
-### Configuración Tecnoweb (Compatibilidad)
-```
-Host: mail.tecnoweb.org.bo
-Puerto: 5432
-Base de datos: db_grupo21sc
-Usuario: grupo21sc
-Password: grup021grup021*
-```
+---
 
-## 📦 Instalación
+## 🚀 **Inicio Rápido**
 
-### 1. Prerequisitos
-- Java 8 o superior
-- PostgreSQL
-- Base de datos `EcommerceTool` creada
+### **Método 1: Scripts Automatizados (Recomendado)**
 
-### 2. Inicializar Base de Datos
 ```bash
-# Conectar a PostgreSQL como postgres
+# 1. Compilar todo automáticamente
+./compile.sh
+
+# 2. Ejecutar lanzador principal
+./run.sh
+```
+
+### **Método 2: Comandos Manuales**
+
+```bash
+# 1. Compilar manualmente
+javac -cp "lib/*:src/main/java" -d . src/main/java/**/*.java
+
+# 2. Ejecutar usando uno de los dos lanzadores:
+
+# Opción A: Lanzador en raíz (más simple)
+java -cp "lib/*:." LanzadorPrincipal
+
+# Opción B: Lanzador en tecnoweb (más opciones)
+java -cp "lib/*:." com.mycompany.parcial1.tecnoweb.LanzadorPrincipal
+```
+
+---
+
+## 🎛️ **Lanzadores Principales**
+
+El sistema incluye **dos lanzadores** diferentes según tus necesidades:
+
+### **🔹 LanzadorPrincipal.java (Raíz) - Simplificado**
+**Ubicación:** `LanzadorPrincipal.java`
+**Uso:** `java -cp "lib/*:." LanzadorPrincipal`
+
+**Opciones disponibles:**
+1. 🤖 **Monitor Gmail** - Procesamiento automático v2.0
+2. 🧪 **Test EmailApp** - Pruebas locales 
+3. 📊 **Información del Sistema** - Configuración y ayuda
+4. 🔧 **Configuración avanzada** - Settings
+
+### **🔹 LanzadorPrincipal.java (Tecnoweb) - Completo**
+**Ubicación:** `src/main/java/com/mycompany/parcial1/tecnoweb/LanzadorPrincipal.java`
+**Uso:** `java -cp "lib/*:." com.mycompany.parcial1.tecnoweb.LanzadorPrincipal`
+
+**Opciones disponibles:**
+1. 📧 **EmailApp Tecnoweb** - Versión original POP3
+2. 🤖 **Monitor Gmail con Comandos** - Versión v2.0
+3. 🌐 **Servidor HTTP Email** - Interfaz web
+4. 🔄 **Sistema Completo** - Monitor + HTTP
+5. 📊 **Test EmailApp** - Pruebas
+6. ❓ **Información completa** - Documentación detallada
+
+---
+
+## 📦 **Instalación Completa**
+
+### **1. Requisitos del Sistema**
+```bash
+# Java 17+ (requerido)
+java -version
+
+# PostgreSQL 13+ (requerido)
+psql --version
+
+# Git (para clonar)
+git --version
+```
+
+### **2. Clonar e Instalar**
+```bash
+# Clonar repositorio
+git clone [tu-repositorio]
+cd tecno-mail
+
+# Descargar librerías JavaMail
+mkdir -p lib
+# Descargar mail-1.5.0-b01.jar y activation-1.1.1.jar a lib/
+```
+
+### **3. Configurar Base de Datos**
+```bash
+# Crear base de datos
+sudo -u postgres createdb EcommerceTool
+
+# Inicializar estructura y datos
 psql -U postgres -d EcommerceTool -f sql/init_database.sql
 ```
 
-### 3. Compilar
+### **4. Compilar y Ejecutar**
 ```bash
-# Compilar con dependencias JavaMail
-javac -cp "lib/*:src/main/java" LanzadorPrincipal.java
-```
+# Compilar automáticamente
+./compile.sh
 
-## 🎯 Modos de Funcionamiento
-
-### 🚀 Lanzador Principal
-```bash
-java -cp "lib/*:src/main/java:." LanzadorPrincipal
-```
-
-#### Opciones Disponibles:
-
-**🔧 Versión Tecnoweb (Original)**
-1. **EmailApp Tecnoweb** - Procesa emails via POP3 desde mail.tecnoweb.org.bo
-
-**🆕 Versión Independiente (Nueva)**
-2. **Monitor Gmail con Comandos** - Procesa comandos CRUD via email
-3. **Servidor HTTP Email** - Interfaz web + API REST
-4. **Sistema Completo** - Monitor Gmail + Servidor HTTP
-
-**🛠️ Herramientas**
-5. **Test EmailApp Independiente** - Prueba procesamiento de comandos
-6. **Información del Sistema** - Muestra configuración actual
-
-## 📧 Comandos Disponibles via Email
-
-### ✅ Implementados
-- `usuario get` - Lista todos los usuarios
-- `usuario get <id>` - Obtiene usuario por ID
-- `help` - Muestra comandos disponibles
-
-### ⏳ En desarrollo
-- `usuario add <params>` - Crear usuario
-- `usuario modify <params>` - Modificar usuario
-- `usuario delete <id>` - Eliminar usuario
-- `evento`, `reserva`, `pago`, etc.
-
-## 🌐 Servidor HTTP
-
-### Endpoints
-- **GET /** - Interfaz web
-- **POST /send-email** - Enviar email via API
-
-### Uso con ngrok
-```bash
-# Iniciar ngrok (opcional para acceso público)
-ngrok http 8080
-```
-
-### URL de Ejemplo
-```
-Local: http://localhost:8080
-Ngrok: https://340c-181-188-162-193.ngrok-free.app
-```
-
-## 📊 Estructura del Proyecto
-
-```
-src/main/java/
-├── com/mycompany/parcial1/tecnoweb/
-│   ├── EmailApp.java                    # Versión tecnoweb
-│   ├── EmailAppIndependiente.java       # Versión independiente
-│   └── LanzadorPrincipal.java          # Launcher principal
-├── servidor/
-│   ├── GmailMonitorComandos.java       # Monitor híbrido
-│   ├── HTTPEmailServer.java            # Servidor HTTP
-│   └── GmailRelay.java                 # Relay Gmail
-├── data/
-│   └── DUsuario.java                   # DAO usuarios
-├── negocio/
-│   └── NUsuario.java                   # Lógica de negocio
-└── postgresConecction/
-    └── DBConnection.java               # Configuración DB
-
-sql/
-└── init_database.sql                   # Script de inicialización
-
-lib/
-├── mail-1.5.0-b01.jar                 # JavaMail API
-└── activation-1.1.1.jar               # Activation framework
-```
-
-## 🔄 Diferencias entre Versiones
-
-### 📧 Versión Tecnoweb
-- ✅ Usa POP3 para recibir emails
-- ✅ Compatible con servidor original
-- ⚠️ Dependiente de disponibilidad de tecnoweb.org.bo
-- 🗄️ Base de datos: db_grupo21sc en mail.tecnoweb.org.bo
-
-### 🆕 Versión Independiente
-- ✅ Usa Gmail IMAP para recibir emails
-- ✅ Completamente independiente
-- ✅ Procesamiento CRUD via email
-- ✅ Servidor HTTP con interfaz web
-- ✅ API REST para aplicaciones
-- ✅ Respuestas automáticas personalizadas
-- 🗄️ Base de datos: EcommerceTool en localhost
-
-## 🎯 Uso Rápido
-
-### 1. Monitor de Emails con Comandos
-```bash
-java -cp "lib/*:src/main/java" servidor.GmailMonitorComandos
-```
-
-### 2. Servidor HTTP
-```bash
-java -cp "lib/*:src/main/java" servidor.HTTPEmailServer
-```
-
-### 3. Test de Comandos
-```bash
-java -cp "lib/*:src/main/java" com.mycompany.parcial1.tecnoweb.EmailAppIndependiente
-```
-
-## 📝 Ejemplos de Comandos via Email
-
-### Enviar email a: marcodavidtoledo@gmail.com
-
-**Asunto**: `usuario get`
-**Contenido**: `Quiero ver todos los usuarios`
-
-**Asunto**: `usuario get 1`
-**Contenido**: `Mostrar usuario con ID 1`
-
-**Asunto**: `help`
-**Contenido**: `Necesito ayuda con los comandos`
-
-## 🔧 Solución de Problemas
-
-### Error de Conexión a Base de Datos
-1. Verificar que PostgreSQL esté ejecutándose
-2. Verificar que la base de datos `EcommerceTool` exista
-3. Verificar credenciales en `DBConnection.java`
-
-### Error de Gmail IMAP
-1. Verificar conexión a internet
-2. Verificar credenciales de Gmail
-3. Verificar configuración de "Apps menos seguras" en Gmail
-
-### Error de Compilación
-1. Verificar que los JARs estén en la carpeta `lib/`
-2. Verificar versión de Java (mínimo Java 8)
-
-## 🌟 Características Destacadas
-
-- ✅ **Dual Mode**: Tecnoweb + Independiente
-- ✅ **Email Processing**: Comandos CRUD via email
-- ✅ **HTTP API**: Interfaz web + REST endpoints
-- ✅ **Real-time Monitoring**: Detección automática de emails
-- ✅ **Auto Response**: Respuestas automáticas personalizadas
-- ✅ **Database Integration**: PostgreSQL local + remoto
-- ✅ **Error Handling**: Manejo robusto de errores
-- ✅ **Gmail Integration**: SMTP/IMAP con Gmail
-- ✅ **Ngrok Support**: Acceso público via túneles
-
-## 📞 Soporte
-
-Para soporte o consultas:
-- **Email**: marcodavidtoledo@gmail.com
-- **Prueba del servidor**: https://340c-181-188-162-193.ngrok-free.app
-
-# 📧 SISTEMA DE EMAIL CON COMANDOS v2.0
-
-**Sistema completo de manejo de emails que permite ejecutar comandos CRUD enviando emails. Nueva funcionalidad: responde a emails con comandos en el contenido.**
-
----
-
-## 🚀 **NOVEDADES v2.0**
-
-### ✅ **PROBLEMA SOLUCIONADO: Respuestas a Emails**
-
-**Antes:** Solo detectaba comandos en el asunto del email
-**Ahora:** Detecta comandos tanto en el asunto COMO en el contenido
-
-**Ejemplo de uso:**
-1. El sistema te envía un email con lista de usuarios
-2. Tú respondes a ese email escribiendo "usuario get" en el contenido
-3. El sistema detecta el comando y te responde automáticamente
-
-### 🧹 **LIMPIEZA Y ORGANIZACIÓN**
-
-- ✅ Eliminados archivos de test no utilizados
-- ✅ Casos de uso no implementados claramente marcados
-- ✅ Lanzador principal reorganizado
-- ✅ Documentación actualizada
-
----
-
-## 🎯 **INICIO RÁPIDO**
-
-### **1. Compilar el proyecto**
-```bash
-javac -cp "lib/*:src/main/java" LanzadorPrincipal.java
-```
-
-### **2. Ejecutar sistema**
-```bash
-java -cp "lib/*:src/main/java:." LanzadorPrincipal
-```
-
-### **3. Seleccionar Monitor Gmail (opción 1)**
-
-### **4. Enviar comandos por email**
-- **Email destino:** `marcodavidtoledo@gmail.com`
-- **Comando en asunto:** `usuario get`
-- **O comando en contenido:** Responde a cualquier email escribiendo el comando
-
----
-
-## 📝 **COMANDOS DISPONIBLES**
-
-### 🔓 **Sin Autenticación Requerida**
-```
-registrar Juan Pérez 123456789 masculino
-registrar María González 987654321 femenino
-help
-```
-
-### 🔐 **Con Autenticación (registro previo)**
-```
-usuario get
-usuario get 5
-producto get
-producto get 3
-categoria get
-categoria get 2
-cliente get
-cliente get 1
-tipo_pago get
-tipo_pago get 1
+# Ejecutar
+./run.sh
 ```
 
 ---
 
-## 🏗️ **ARQUITECTURA DEL SISTEMA**
+## 🎮 **Modos de Funcionamiento**
 
+### **🤖 Modo 1: Monitor Gmail (Recomendado)**
+**Para procesamiento automático de comandos via email**
+
+```bash
+# Desde lanzador simple
+./run.sh → Opción 1
+
+# Desde lanzador completo  
+java -cp "lib/*:." com.mycompany.parcial1.tecnoweb.LanzadorPrincipal → Opción 2
+
+# Directo
+java -cp "lib/*:." servidor.GmailMonitorComandos
 ```
-📦 SISTEMA DE EMAIL
-├── 🚀 LanzadorPrincipal.java          - Punto de entrada principal
-├── 🤖 GmailMonitorComandos.java       - Monitor IMAP en tiempo real
-├── 📧 EmailAppIndependiente.java      - Procesador de comandos
-├── 📤 GmailRelay.java                 - Enviador de emails SMTP
-├── 🎨 HtmlRes.java                    - Generador de HTML moderno
-├── 🗄️ DUsuario.java                   - Acceso a datos de usuarios
-├── 🗄️ DProducto.java                  - Acceso a datos de productos
-├── 🗄️ DCategoria.java                 - Acceso a datos de categorías
-├── 🗄️ DCliente.java                   - Acceso a datos de clientes
-└── 🗄️ DTipoPago.java                  - Acceso a datos de tipos de pago
+
+**Funcionalidades:**
+- ✅ Monitoreo Gmail en tiempo real
+- ✅ Detección de comandos en asunto Y contenido
+- ✅ Respuestas como reply al email original
+- ✅ Registro automático de usuarios
+- ✅ Comandos singulares y plurales
+
+### **🌐 Modo 2: Servidor HTTP**
+**Para interfaz web y API REST**
+
+```bash
+java -cp "lib/*:." servidor.HTTPEmailServer
 ```
 
-### **🔄 Flujo de Procesamiento v2.0**
+**Endpoints:**
+- `GET /` - Interfaz web para envío
+- `POST /send-email` - API REST para aplicaciones
 
-```mermaid
-graph TD
-    A[📧 Email Recibido] --> B[🔍 Monitor IMAP]
-    B --> C{🎯 ¿Comando en Asunto?}
-    C -->|Sí| D[✅ Extraer del Asunto]
-    C -->|No| E{🔍 ¿Comando en Contenido?}
-    E -->|Sí| F[🧹 Limpiar HTML/Quotes]
-    E -->|No| G[❌ No Es Comando]
-    F --> H[✅ Extraer del Contenido]
-    D --> I[🤖 EmailAppIndependiente]
-    H --> I
-    I --> J[💾 Base de Datos]
-    J --> K[🎨 HTML Response]
-    G --> L[📧 Respuesta Automática]
-    K --> M[📤 Enviar Respuesta]
-    L --> M
+### **🔄 Modo 3: Sistema Completo**
+**Monitor Gmail + Servidor HTTP simultáneo**
+
+```bash
+java -cp "lib/*:." com.mycompany.parcial1.tecnoweb.LanzadorPrincipal → Opción 4
+```
+
+### **🧪 Modo 4: Test Local**
+**Pruebas sin envío real de emails**
+
+```bash
+./run.sh → Opción 2
 ```
 
 ---
 
-## 🔧 **INSTALACIÓN Y CONFIGURACIÓN**
+## 📧 **Cómo Usar el Sistema**
 
-### **Prerequisitos**
-- Java 8+
-- PostgreSQL 12+
-- Maven (opcional)
-
-### **1. Base de Datos**
-```sql
--- Crear base de datos
-CREATE DATABASE EcommerceTool;
-
--- Tabla de usuarios (principal)
-CREATE TABLE usuario (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    telefono VARCHAR(20) NOT NULL,
-    genero VARCHAR(20) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insertar usuario admin
-INSERT INTO usuario (nombre, apellido, telefono, genero, email) 
-VALUES ('Admin', 'Sistema', '123456789', 'masculino', 'admin@sistema.com');
+### **1. Registrar Usuario**
+Envía email a `marcodavidtoledo@gmail.com`:
+```
+Asunto: registrar Juan Pérez 123456789 masculino
 ```
 
-### **2. Configuración Gmail**
-En `servidor/GmailMonitorComandos.java`:
+### **2. Comandos de Consulta**
+```bash
+# En asunto o contenido del email:
+usuario get              # Lista todos los usuarios
+usuarios get             # (Acepta plural también)
+producto get 1           # Producto con ID 1
+categorias get           # Lista categorías
+help                     # Ayuda completa
+```
+
+### **3. Responder a Emails del Sistema**
+Cuando recibas una respuesta del sistema, **puedes responder ese email** escribiendo un nuevo comando en el contenido:
+
+```
+> El 15 dic 2024, Sistema CRUD escribió:
+> Aquí están los usuarios solicitados...
+
+productos get
+```
+
+El sistema **detectará automáticamente** el comando en tu respuesta.
+
+---
+
+## 🔧 **Configuración Avanzada**
+
+### **📧 Credenciales Gmail**
+Editar `src/main/java/servidor/GmailMonitorComandos.java` y `GmailRelay.java`:
 ```java
 private static final String GMAIL_USERNAME = "tu-email@gmail.com";
-private static final String GMAIL_APP_PASSWORD = "tu-app-password";
+private static final String GMAIL_APP_PASSWORD = "tu-app-password-16-chars";
 ```
 
-### **3. Configuración Base de Datos**
-En `postgresConecction/DBConnection.java`:
+### **🗄️ Base de Datos**
+Editar `src/main/java/postgresConecction/DBConnection.java`:
 ```java
 public static String database = "EcommerceTool";
-public static String server = "127.0.0.1";
+public static String server = "localhost";
+public static String port = "5432";
 public static String user = "postgres";
 public static String password = "tu-password";
 ```
 
----
-
-## 📖 **CÓMO USAR**
-
-### **Método 1: Comando en Asunto**
-1. Envía email a: `marcodavidtoledo@gmail.com`
-2. Asunto: `usuario get`
-3. Contenido: (cualquier cosa)
-
-### **Método 2: Comando en Contenido (NUEVO v2.0)**
-1. Responde a cualquier email del sistema
-2. Escribe el comando en el contenido: `usuario get`
-3. El sistema detecta y procesa automáticamente
-
-### **Validaciones de Registro**
-```
-✅ VÁLIDO:   registrar Juan Pérez 123456789 masculino
-✅ VÁLIDO:   registrar María González 987654321 f
-❌ INVÁLIDO: registrar Juan (faltan parámetros)
-❌ INVÁLIDO: registrar Juan Pérez abc masculino (teléfono inválido)
-```
-
----
-
-## 🎨 **EJEMPLOS DE RESPUESTAS**
-
-### **✅ Respuesta de Éxito**
-```html
-🎉 ¡Registro Exitoso!
-¡Bienvenido Juan Pérez!
-Email registrado: usuario@example.com
-```
-
-### **❌ Respuesta de Error**
-```html
-❌ Error en Registro
-Comando: registrar Juan
-Error: Faltan parámetros (1 de 4)
-Corrección: registrar Juan Pérez 123456789 masculino
-```
-
-### **📊 Respuesta con Tabla**
-```html
-📊 Lista de Usuarios
-┌─────┬────────────────┬─────────────────────┐
-│ ID  │ Nombre         │ Email               │
-├─────┼────────────────┼─────────────────────┤
-│ 1   │ Juan Pérez     │ juan@example.com    │
-│ 2   │ María González │ maria@example.com   │
-└─────┴────────────────┴─────────────────────┘
-```
-
----
-
-## 🧪 **TESTING Y DESARROLLO**
-
-### **Test Local (Sin Emails Reales)**
-```bash
-java -cp postgresql-42.7.4.jar:target/classes LanzadorPrincipal
-# Seleccionar opción 2: Test EmailApp
-```
-
-### **Test de Comandos**
+### **⏱️ Intervalo de Monitoreo**
+En `GmailMonitorComandos.java`:
 ```java
-EmailAppIndependiente app = new EmailAppIndependiente();
-app.processEmailCommand("test@test.com", "usuario get", "contenido");
+Thread.sleep(10000); // 10 segundos (actual)
+Thread.sleep(5000);  // 5 segundos (más rápido)
 ```
 
 ---
 
-## 🔍 **CARACTERÍSTICAS TÉCNICAS**
+## 📊 **Estructura de Datos**
 
-### **🎯 Detección de Comandos v2.0**
-- ✅ **Asunto del email** (tradicional)
-- ✅ **Contenido del email** (nuevo)
-- ✅ **Limpieza automática** de HTML y texto citado
-- ✅ **Decodificación** de quoted-printable
-- ✅ **Filtrado** de líneas de respuesta/quote
+### **Usuarios**
+- id, nombre, apellido, telefono, genero, email, password, rol_id
 
-### **🛡️ Validaciones Implementadas**
-- ✅ **Registro:** 4 parámetros exactos
-- ✅ **Teléfono:** Solo números, mínimo 6 dígitos
-- ✅ **Género:** masculino/femenino/m/f
-- ✅ **Email:** Inclusión automática del remitente
+### **Productos** 
+- id, cod_producto, nombre, precio_compra, precio_venta, imagen, descripcion, categoria
 
-### **🎨 Generación HTML**
-- ✅ **CSS moderno** con gradientes
-- ✅ **Responsive design**
-- ✅ **Tablas profesionales**
-- ✅ **Mensajes de error con sugerencias**
+### **Categorías**
+- id, nombre, descripcion
+
+### **Clientes**
+- id, nit, direccion, user_id
+
+### **Tipos de Pago**
+- id, tipo_pago, created_at
 
 ---
 
-## 🚨 **SOLUCIÓN DE PROBLEMAS**
+## 🛠️ **Desarrollo y Testing**
 
-### **❌ "No se encontraron comandos válidos"**
-**Causa:** El comando no está en la lista de comandos soportados
-**Solución:** Verificar comandos disponibles con `help`
-
-### **❌ "Error de base de datos"**
-**Causa:** PostgreSQL no está ejecutándose o configuración incorrecta
-**Solución:** 
+### **🧪 Testing Automatizado**
 ```bash
-sudo service postgresql start
-psql -U postgres -d EcommerceTool -c "SELECT 1;"
+# Test completo de comandos
+java -cp "lib/*:." test.TestTodosComandos
+
+# Test específico de usuario
+java -cp "lib/*:." test.TestComandoUsuario
+
+# Test directo sin emails
+java -cp "lib/*:." TestEmailAppDirecto
 ```
 
-### **❌ "Authentication failed"**
-**Causa:** Credenciales de Gmail incorrectas
-**Solución:** Verificar app password en configuración
+### **🔍 Debugging**
+```bash
+# Ejecutar con logs detallados
+java -cp "lib/*:." servidor.GmailMonitorComandos 2>&1 | tee logs.txt
 
-### **❌ "Comando encontrado pero no responde"**
-**Causa:** Error en procesamiento interno
-**Solución:** Revisar logs de consola para detalles
-
----
-
-## 📋 **CASOS DE USO**
-
-### **✅ IMPLEMENTADOS Y FUNCIONALES**
-- **Registro de usuarios** (sin autenticación)
-- **Consulta de usuarios** (con autenticación)
-- **Consulta de productos** (con autenticación)
-- **Consulta de categorías** (con autenticación)
-- **Consulta de clientes** (con autenticación)
-- **Consulta de tipos de pago** (con autenticación)
-- **Sistema de ayuda**
-
-### **❌ NO IMPLEMENTADOS (Responden "No Disponible")**
-- Eventos, Reservas, Pagos
-- Proveedores, Promociones
-- Patrocinadores, Patrocinios
-- Roles, Servicios
-- Detalles de Eventos
-
----
-
-## 🔮 **ROADMAP FUTURO**
-
-### **v2.1 - Próximas Mejoras**
-- 🔐 **Autenticación por tokens** para mayor seguridad
-- 📊 **Dashboard web** para monitoreo
-- 🔍 **Búsqueda avanzada** en base de datos
-- 📱 **Notificaciones push** para administradores
-
-### **v3.0 - Expansión**
-- 🌐 **API REST** complementaria
-- 📈 **Métricas y analytics** de uso
-- 🔄 **Sync con otros sistemas** de email
-- 🤖 **IA para procesamiento** de lenguaje natural
-
----
-
-## 👥 **CRÉDITOS**
-
-- **🧑‍💻 Desarrollador:** Marco David Toledo
-- **📧 Email:** marcodavidtoledo@gmail.com
-- **🗓️ Versión:** 2.0 - Diciembre 2024
-- **🎯 Propósito:** Sistema CRUD via Email con detección avanzada
-
----
-
-## 📄 **LICENCIA**
-
-```
-MIT License - Uso libre para proyectos educativos y comerciales
+# Test de conexión a BD
+java -cp "lib/*:." postgresConecction.TestConnection
 ```
 
+### **📝 Logs del Sistema**
+- Conexiones de base de datos
+- Emails procesados
+- Comandos ejecutados
+- Errores detallados
+
 ---
 
-**🎉 ¡SISTEMA LISTO PARA USAR!** 
+## 🚨 **Solución de Problemas**
 
-Para comenzar: `java -cp postgresql-42.7.4.jar:target/classes LanzadorPrincipal`
+### **❌ Error de Compilación**
+```bash
+# Verificar librerías
+ls -la lib/
+# Debe contener: mail-1.5.0-b01.jar, activation-1.1.1.jar
+
+# Limpiar y recompilar
+rm -rf *.class **/*.class
+./compile.sh
+```
+
+### **❌ Error de Base de Datos**
+```bash
+# Verificar PostgreSQL
+sudo systemctl status postgresql
+sudo systemctl start postgresql
+
+# Recrear base de datos
+sudo -u postgres dropdb EcommerceTool
+sudo -u postgres createdb EcommerceTool
+psql -U postgres -d EcommerceTool -f sql/init_database.sql
+```
+
+### **❌ Error de Gmail**
+1. Verificar credenciales en el código
+2. Confirmar contraseña de aplicación (no la normal)
+3. Verificar 2FA habilitado en Google
+4. Revisar limits de API
+
+### **❌ No Detecta Comandos**
+1. Verificar formato exacto de comandos
+2. Revisar que el usuario esté registrado
+3. Confirmar que el email llegue (revisar spam)
+4. Verificar logs del monitor
+
+---
+
+## 🎉 **Casos de Uso Reales**
+
+### **💼 Empresa de Inventario**
+```bash
+# Consultar productos
+productos get
+
+# Ver categorías disponibles  
+categorias get
+
+# Registrar nuevo empleado
+registrar Ana García 987654321 femenino
+```
+
+### **🛍️ E-commerce**
+```bash
+# Revisar catálogo
+productos get
+
+# Verificar clientes
+clientes get
+
+# Ver métodos de pago
+tipos_pago get
+```
+
+### **👥 Gestión de Usuarios**
+```bash
+# Listar todos los usuarios
+usuarios get
+
+# Ver usuario específico
+usuario get 5
+
+# Ayuda completa
+help
+```
+
+---
+
+## 🔮 **Funcionalidades Futuras**
+
+### **⏳ En Desarrollo**
+- ✅ Comandos de escritura (CREATE, UPDATE, DELETE)
+- ✅ Autenticación por roles
+- ✅ Upload de imágenes via email
+- ✅ Reportes automáticos por email
+- ✅ Integración con más bases de datos
+
+### **💡 Propuestas**
+- 🔄 Webhooks para eventos
+- 📊 Dashboard web en tiempo real
+- 🤖 Chatbot integrado
+- 📱 Aplicación móvil
+- 🔐 OAuth2 para Gmail
+
+---
+
+## 📞 **Soporte y Contacto**
+
+### **👨‍💻 Desarrollador**
+- **Nombre:** Marco David Toledo
+- **Email:** marcodavidtoledo@gmail.com
+- **Proyecto:** Sistema CRUD via Email v2.0
+
+### **🐛 Reportar Bugs**
+1. Describe el problema detalladamente
+2. Incluye logs del error
+3. Especifica tu configuración
+4. Envía email con pasos para reproducir
+
+### **💡 Sugerencias**
+- Nuevos comandos a implementar
+- Mejoras en la interfaz
+- Optimizaciones de rendimiento
+- Integraciones adicionales
+
+---
+
+## 📜 **Licencia y Créditos**
+
+### **📄 Licencia**
+Este proyecto está desarrollado para fines educativos y puede ser utilizado libremente.
+
+### **🙏 Créditos**
+- **JavaMail API** - Para funcionalidad de email
+- **PostgreSQL** - Base de datos principal  
+- **Gmail API** - Servicio de email
+- **ngrok** - Túneles para desarrollo
+
+### **⭐ Agradecimientos**
+- Universidad por el proyecto base
+- Comunidad PostgreSQL
+- Documentación de JavaMail
+- Stack Overflow por soluciones
+
+---
+
+## 🚀 **¡Empezar Ahora!**
+
+```bash
+# 1. Clona el repositorio
+git clone [tu-repositorio]
+
+# 2. Configura la base de datos
+sudo -u postgres createdb EcommerceTool
+psql -U postgres -d EcommerceTool -f sql/init_database.sql
+
+# 3. Compila y ejecuta
+./compile.sh
+./run.sh
+
+# 4. Envía tu primer comando
+# Email a: marcodavidtoledo@gmail.com
+# Asunto: help
+```
+
+**¡Tu sistema está listo! 🎉**
+
+---
+
+*Documentación actualizada: Diciembre 2024 | v2.0 | Sistema de Email con Comandos CRUD*
