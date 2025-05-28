@@ -1,0 +1,6 @@
+ERROR:  failed to start tunnel: You must add a credit or debit card before you can use TCP endpoints on a free account. We require a valid card as a way to combat abuse and keep the internet a safe place. This card will NOT  be charged.
+ERROR:  Add a card to your account here: https://dashboard.ngrok.com/settings#id-verification
+ERROR:  
+ERROR:  ERR_NGROK_8013
+ERROR:  https://ngrok.com/docs/errors/err_ngrok_8013
+ERROR:  

@@ -1,0 +1,120 @@
+package servidor;
+
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+/**
+ * Relay que envía emails a través de Gmail usando las credenciales configuradas
+ *
+ * @author MARCO
+ */
+public class GmailRelay {
+
+    // 🔧 CONFIGURACIÓN DE TUS CREDENCIALES DE GMAIL
+    private static final String GMAIL_SMTP_HOST = "smtp.gmail.com";
+    private static final String GMAIL_SMTP_PORT = "587";
+    private static final boolean USE_SSL = true;
+
+    // ⚠️ CAMBIAR ESTAS CREDENCIALES POR LAS TUYAS:
+    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
+    private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss"; // Contraseña de aplicación
+
+    private final Session session;
+
+    public GmailRelay() {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", GMAIL_SMTP_HOST);
+        props.put("mail.smtp.port", GMAIL_SMTP_PORT);
+        props.put("mail.smtp.auth", "true");
+
+        if (USE_SSL) {
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        }
+
+        this.session = Session.getInstance(props, new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(GMAIL_USERNAME, GMAIL_APP_PASSWORD);
+            }
+        });
+    }
+
+    /**
+     * Envía un email a través de Gmail
+     *
+     * @param from Dirección del remitente (se mostrará como from pero se
+     * enviará desde Gmail)
+     * @param to Dirección del destinatario
+     * @param subject Asunto del mensaje
+     * @param content Contenido del mensaje
+     */
+    public void sendEmail(String from, String to, String subject, String content) {
+        try {
+            MimeMessage message = new MimeMessage(session);
+
+            // Usar Gmail como remitente real, pero mostrar el from original en Reply-To
+            message.setFrom(new InternetAddress(GMAIL_USERNAME));
+            message.setReplyTo(new InternetAddress[]{new InternetAddress(from)});
+            message.setRecipients(MimeMessage.RecipientType.TO, InternetAddress.parse(to));
+
+            // Agregar información del servidor en el asunto
+            message.setSubject("[Mi-Servidor] " + subject);
+
+            // Agregar header personalizado para identificar el servidor
+            message.addHeader("X-Original-From", from);
+            message.addHeader("X-Server", "mi-servidor.local");
+
+            // Detectar si el contenido es HTML
+            boolean isHtml = content.trim().startsWith("<!DOCTYPE html") || content.trim().startsWith("<html");
+            
+            if (isHtml) {
+                // Si es HTML, enviarlo como HTML
+                message.setContent(content, "text/html; charset=utf-8");
+                System.out.println("   🎨 Enviando como HTML");
+            } else {
+                // Si es texto plano, agregar información del servidor
+                String fullContent = "📧 Mensaje recibido en mi-servidor.local\n"
+                        + "👤 Remitente original: " + from + "\n"
+                        + "🕐 Procesado por: Gmail Relay\n"
+                        + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+                        + content;
+                message.setText(fullContent, "utf-8");
+                System.out.println("   📄 Enviando como texto plano");
+            }
+
+            Transport.send(message);
+
+            System.out.println("✅ Email enviado exitosamente:");
+            System.out.println("   📤 From: " + from + " (via " + GMAIL_USERNAME + ")");
+            System.out.println("   📥 To: " + to);
+            System.out.println("   📝 Subject: " + subject);
+
+        } catch (MessagingException e) {
+            System.err.println("❌ Error enviando email: " + e.getMessage());
+            Logger.getLogger(GmailRelay.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+
+    /**
+     * Configura las credenciales de Gmail dinámicamente
+     *
+     * @param username Tu email de Gmail
+     * @param appPassword Tu contraseña de aplicación de Gmail
+     */
+    public static void configurarCredenciales(String username, String appPassword) {
+        System.out.println("💡 Para configurar las credenciales:");
+        System.out.println("   1. Edita la clase GmailRelay.java");
+        System.out.println("   2. Cambia GMAIL_USERNAME por: " + username);
+        System.out.println("   3. Cambia GMAIL_APP_PASSWORD por: " + appPassword);
+        System.out.println("   4. Recompila el proyecto");
+    }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error de Registro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .error-box {
+            background: #fdf2f2;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❌ Error en Registro</h1>
+        </div>
+        <div class="content">
+            <div class="error-box">
+                <p><strong>Comando recibido:</strong> <code>registrar Juan</code></p>
+                <p><strong>Error:</strong> Faltan parámetros (1 de 4 requeridos)</p>
+                <p><strong>Formato correcto:</strong><br>
+                <code>registrar nombre apellido telefono genero</code></p>
+                <p><strong>Ejemplos válidos:</strong></p>
+                <ul>
+                    <li><code>registrar Juan Pérez 123456789 masculino</code></li>
+                    <li><code>registrar María González 987654321 femenino</code></li>
+                    <li><code>registrar Carlos Ruiz 555123456 m</code></li>
+                </ul>
+                <p><strong>Tu email se registrará automáticamente:</strong> usuario@example.com</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
