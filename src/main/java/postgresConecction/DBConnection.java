@@ -8,7 +8,7 @@ public class DBConnection {
     public static String user = "postgres";
     public static String password = "postgres";
     public static String url = "jdbc:postgresql://" + server + ":" + port + "/" + database;
-    
+
     // 🔧 CONFIGURACIÓN TECNOWEB (para compatibilidad)
     public static class TecnoWeb {
         public static String database = "db_grupo21sc";

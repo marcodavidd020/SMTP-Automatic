@@ -234,13 +234,13 @@ public class GmailMonitorComandos {
      */
     private void processEmailCommandWithReply(String from, String command, String content, String originalSubject, String messageId) {
         try {
-            // Guardar messageId temporalmente y procesar
+            // Procesar comando usando el nuevo método que soporta reply
             System.out.println("   💬 Configurando respuesta como reply al mensaje: " + messageId);
             
-            // TODO: Modificar EmailApp para soportar messageId - por ahora usar método original
-            emailApp.processEmailCommand(from, command, content);
+            // Usar el método sobrecargado que acepta originalSubject y messageId
+            emailApp.processEmailCommand(from, command, content, originalSubject, messageId);
             
-            System.out.println("   📧 Comando procesado (reply pendiente de implementación completa)");
+            System.out.println("   📧 Comando procesado con soporte para reply");
             
         } catch (Exception e) {
             System.err.println("❌ Error procesando comando con reply: " + e.getMessage());
