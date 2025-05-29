@@ -5,6 +5,7 @@
 package interfaces;
 
 import java.util.List;
+
 import librerias.Email;
 
 /**
@@ -12,7 +13,7 @@ import librerias.Email;
  * @author MARCO
  */
 public interface IEmailListener {
-    
-    void onReceiptEmail(List<Email> emails );
-    
+
+    void onReceiptEmail(List<Email> emails);
+
 }

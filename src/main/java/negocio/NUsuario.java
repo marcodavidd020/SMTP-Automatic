@@ -1,9 +1,10 @@
 package negocio;
 
-import data.DUsuario;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import data.DUsuario;
 
 public class NUsuario {
 
@@ -19,6 +20,13 @@ public class NUsuario {
 
     public List<String[]> get(int id) throws SQLException {
         return dUsuario.get(id);
+    }
+
+    /**
+     * Obtiene usuario por email
+     */
+    public List<String[]> getByEmail(String email) throws SQLException {
+        return dUsuario.getByEmail(email);
     }
 
     public  List<String[]> save(List<String> parametros) throws SQLException {

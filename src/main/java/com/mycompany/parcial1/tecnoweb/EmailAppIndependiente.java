@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import data.DCarrito;
 import data.DCategoria;
 import data.DCliente;
 import data.DProducto;
 import data.DTipoPago;
 import data.DUsuario;
+import data.DVenta;
 import interfaces.ICasoUsoListener;
 import librerias.HtmlRes;
 import librerias.ParamsAction;
@@ -40,6 +42,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private DCategoria dCategoria;
     private DCliente dCliente;
     private DTipoPago dTipoPago;
+    private DCarrito dCarrito;
+    private DVenta dVenta;
 
     public EmailAppIndependiente() {
         this.emailRelay = new GmailRelay();
@@ -48,6 +52,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         this.dCategoria = new DCategoria();
         this.dCliente = new DCliente();
         this.dTipoPago = new DTipoPago();
+        this.dCarrito = new DCarrito();
+        this.dVenta = new DVenta();
 
         System.out.println("🚀 EmailApp Independiente inicializado");
         System.out.println("📧 Modo: Servidor Independiente con Gmail");
@@ -88,11 +94,14 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             System.out.println("\n🔄 Procesando comando de email:");
             System.out.println("   📧 From: " + senderEmail);
             System.out.println("   📝 Subject: " + subject);
+            if (content != null && !content.trim().isEmpty()) {
+                System.out.println("   💬 Content preview: " + content.substring(0, Math.min(content.length(), 50)) + "...");
+            }
             if (messageId != null) {
                 System.out.println("   🆔 Message-ID: " + messageId);
                 System.out.println("   💬 Responderá como REPLY al email original");
             }
-
+            
             // Verificar conexión antes de procesar
             if (!TestConnection.testConnection()) {
                 System.err.println("   ❌ Error de conexión a base de datos");
@@ -101,35 +110,82 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         originalSubject, messageId);
                 return;
             }
-
-            // Verificar si el comando es para registro
+            
+            // Verificar si el comando es para registro (solo en subject)
             if (isRegistrationCommand(subject)) {
                 processRegistrationCommand(senderEmail, subject, originalSubject, messageId);
                 return;
             }
-
+            
             // Verificar si el usuario está registrado
             if (!isUserRegistered(senderEmail)) {
                 System.out.println("   ❌ Usuario no registrado: " + senderEmail);
                 sendWelcomeEmailAsReply(senderEmail, originalSubject, messageId);
                 return;
             }
-
-            // Verificar si es un comando válido
-            if (!isCommandEmail(subject)) {
-                System.out.println("   ⏭️ No es un comando válido, omitiendo");
+            
+            // 🆕 BUSCAR COMANDOS EN SUBJECT Y CONTENT
+            String comando = null;
+            
+            // Primero buscar en el subject
+            if (isCommandEmail(subject)) {
+                comando = subject.toLowerCase().trim();
+                System.out.println("   ✅ Comando encontrado en SUBJECT: " + comando);
+            }
+            // Si no hay comando en subject, buscar en content (para respuestas)
+            else if (content != null && !content.trim().isEmpty()) {
+                String comandoEnContent = extractCommandFromContent(content);
+                if (comandoEnContent != null && isCommandEmail(comandoEnContent)) {
+                    comando = comandoEnContent;
+                    System.out.println("   ✅ Comando encontrado en CONTENT: " + comando);
+                }
+            }
+            
+            // Si no se encontró comando válido, omitir
+            if (comando == null) {
+                System.out.println("   ⏭️ No se encontraron comandos válidos, omitiendo");
                 return;
             }
-
-            // Procesar comando directamente
-            String comando = subject.toLowerCase().trim();
+            
+            // Procesar comando encontrado
             processDirectCommand(senderEmail, comando, originalSubject, messageId);
-
+            
         } catch (Exception e) {
             System.err.println("❌ Error procesando comando: " + e.getMessage());
             sendErrorEmailAsReply(senderEmail, "Error procesando comando: " + e.getMessage(), originalSubject,
                     messageId);
         }
+    }
+
+    /**
+     * 🆕 Extrae comando del contenido del email (para respuestas)
+     * Busca líneas que no empiecen con ">" (texto citado) y que contengan comandos válidos
+     */
+    private String extractCommandFromContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            return null;
+        }
+        
+        String[] lines = content.split("\n");
+        for (String line : lines) {
+            line = line.trim();
+            
+            // Ignorar líneas vacías y texto citado (que empieza con >)
+            if (line.isEmpty() || line.startsWith(">")) {
+                continue;
+            }
+            
+            // 🆕 LIMPIAR CORCHETES de los comandos
+            line = line.replaceAll("\\[|\\]", "");
+            
+            // Buscar primera línea que contenga un comando válido
+            if (isCommandEmail(line)) {
+                System.out.println("   🔍 Línea de comando detectada: " + line);
+                return line.toLowerCase().trim();
+            }
+        }
+        
+        return null;
     }
 
     /**
@@ -288,13 +344,26 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 case "tipo_pago":
                     processTipoPagoCommand(senderEmail, action, param, comando, originalSubject, messageId);
                     break;
+                case "carrito":
+                    processCarritoCommand(senderEmail, action, param, comando, originalSubject, messageId);
+                    break;
+                case "checkout":
+                    processCheckoutCommand(senderEmail, comando, originalSubject, messageId);
+                    break;
+                case "pago":
+                    processPagoCommand(senderEmail, action, param, comando, originalSubject, messageId);
+                    break;
+                case "ventas":
+                case "compras":
+                    processVentasCommand(senderEmail, action, param, comando, originalSubject, messageId);
+                    break;
                 case "help":
                     processHelpCommand(senderEmail, comando, originalSubject, messageId);
                     break;
                 default:
                     sendErrorEmail(senderEmail,
                             "Comando no reconocido: " + parts[0]
-                                    + " (intenta: usuario, producto, categoria, cliente, tipo_pago, help)",
+                                    + " (intenta: usuario, producto, categoria, cliente, tipo_pago, carrito, checkout, pago, ventas, help)",
                             originalSubject, messageId);
             }
 
@@ -412,7 +481,21 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "tipo_pago get <id> / tipos_pago get <id>", "✅ SÍ",
                     "Tipo de pago específico por ID" });
 
+            // 🆕 COMANDOS DEL SISTEMA DE E-COMMERCE
+            data.add(new String[] { "", "", "" });
+            data.add(new String[] { "🛒 SISTEMA DE E-COMMERCE:", "", "" });
+            data.add(new String[] { "carrito add [producto_id] [cantidad]", "✅ SÍ", "Agregar producto al carrito" });
+            data.add(new String[] { "carrito get", "✅ SÍ", "Ver contenido del carrito" });
+            data.add(new String[] { "carrito remove [producto_id]", "✅ SÍ", "Remover producto del carrito" });
+            data.add(new String[] { "carrito clear", "✅ SÍ", "Vaciar carrito completo" });
+            data.add(new String[] { "checkout", "✅ SÍ", "Crear orden de compra" });
+            data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago de orden" });
+            data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
+            data.add(new String[] { "ventas get [venta_id]", "✅ SÍ", "Ver detalle de compra específica" });
+
             // Comandos de administración (próximamente)
+            data.add(new String[] { "", "", "" });
+            data.add(new String[] { "⏳ EN DESARROLLO:", "", "" });
             data.add(new String[] { "producto add nombre precio_compra precio_venta descripcion categoria_id",
                     "⏳ DESARROLLO", "Agregar nuevo producto" });
             data.add(new String[] { "categoria add nombre descripcion", "⏳ DESARROLLO", "Agregar nueva categoría" });
@@ -425,18 +508,17 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "✅ Comandos en SINGULAR y PLURAL", "NUEVO",
                     "usuario = usuarios, producto = productos" });
             data.add(new String[] { "✅ Respuestas como REPLY", "NUEVO", "El sistema responde a tu email original" });
-            data.add(new String[] { "✅ Nombres de categoría en productos", "NUEVO", "Muestra nombre en lugar de ID" });
-            data.add(new String[] { "✅ Comandos en CONTENIDO de email", "NUEVO",
-                    "Puedes escribir comandos en el texto" });
+            data.add(new String[] { "✅ Sistema de E-commerce", "NUEVO", "Carrito, checkout, pago y ventas" });
+            data.add(new String[] { "✅ Control de stock automático", "NUEVO", "Stock actualizado al comprar" });
 
             // Comandos no implementados
             data.add(new String[] { "", "", "" });
+            data.add(new String[] { "❌ NO IMPLEMENTADOS:", "", "" });
             data.add(new String[] { "evento *", "❌ NO", "Gestión de eventos - No implementado" });
             data.add(new String[] { "reserva *", "❌ NO", "Gestión de reservas - No implementado" });
-            data.add(new String[] { "pago *", "❌ NO", "Gestión de pagos - No implementado" });
             data.add(new String[] { "promocion *", "❌ NO", "Gestión de promociones - No implementado" });
 
-            sendTableResponse(senderEmail, "📚 Comandos Disponibles - Sistema CRUD v2.0", headers, data, comando,
+            sendTableResponse(senderEmail, "📚 Comandos Disponibles - Sistema E-commerce v2.0", headers, data, comando,
                     originalSubject, messageId);
         } catch (Exception ex) {
             System.err.println("❌ Error en help: " + ex.getMessage());
@@ -529,7 +611,16 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 subjectLower.startsWith("tipo_pago ") ||
                 subjectLower.startsWith("tipos_pago ") ||
                 subjectLower.equals("tipo_pago get") ||
-                subjectLower.equals("tipos_pago get");
+                subjectLower.equals("tipos_pago get") ||
+                // 🆕 Comandos del sistema de carrito y e-commerce
+                subjectLower.startsWith("carrito ") ||
+                subjectLower.equals("carrito get") ||
+                subjectLower.equals("checkout") ||
+                subjectLower.startsWith("pago ") ||
+                subjectLower.startsWith("ventas ") ||
+                subjectLower.startsWith("compras ") ||
+                subjectLower.equals("ventas get") ||
+                subjectLower.equals("compras get");
     }
 
     // Implementación de la interfaz ICasoUsoListener (métodos requeridos)
@@ -714,6 +805,383 @@ public class EmailAppIndependiente implements ICasoUsoListener {
      */
     private void sendErrorEmailAsReply(String email, String error, String originalSubject, String messageId) {
         sendSimpleResponse(email, "Error de Procesamiento", error, originalSubject, messageId);
+    }
+
+    /**
+     * Procesa comandos relacionados con el carrito de compras
+     */
+    private void processCarritoCommand(String senderEmail, String action, String param, String comando,
+            String originalSubject, String messageId) {
+        try {
+            // Obtener ID del cliente basado en el email
+            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            if (clienteId == 0) {
+                sendSimpleResponse(senderEmail, "❌ Cliente No Configurado",
+                        String.format("🔍 PROBLEMA DETECTADO:\n" +
+                                "Tu usuario (%s) está registrado en el sistema, pero no tienes un perfil de CLIENTE asociado.\n\n" +
+                                "📋 PARA RESOLVER ESTE PROBLEMA:\n" +
+                                "1. Contacta al administrador del sistema\n" +
+                                "2. Solicita que te creen un perfil de cliente\n" +
+                                "3. O envía un email con asunto: 'crear cliente para %s'\n\n" +
+                                "💡 El sistema requiere que tengas un perfil de cliente para poder realizar compras.\n\n" +
+                                "🔧 DETALLES TÉCNICOS:\n" +
+                                "- Email detectado: %s\n" +
+                                "- Usuario registrado: ✅ SÍ\n" +
+                                "- Cliente asociado: ❌ NO\n" +
+                                "- Comando solicitado: %s",
+                                senderEmail, senderEmail, senderEmail, comando),
+                        originalSubject, messageId);
+                return;
+            }
+
+            // 🆕 VALIDACIÓN ESPECIAL: Detectar si falta la acción "add"
+            // Ejemplo: "carrito 147 2" debería ser "carrito add 147 2"
+            try {
+                Integer.parseInt(action); // Si action es un número, falta la acción "add"
+                
+                sendSimpleResponse(senderEmail, "❌ Comando Incompleto",
+                        String.format("Formato incorrecto: '%s'\n\n" +
+                                "✅ FORMATO CORRECTO:\n" +
+                                "carrito add %s %s\n\n" +
+                                "📋 COMANDOS DISPONIBLES:\n" +
+                                "• carrito add [producto_id] [cantidad] - Agregar producto\n" +
+                                "• carrito get - Ver carrito\n" +
+                                "• carrito remove [producto_id] - Remover producto\n" +
+                                "• carrito clear - Vaciar carrito\n\n" +
+                                "💡 Te faltó especificar la acción 'add'",
+                                comando, action, param != null ? param : "[cantidad]"),
+                        originalSubject, messageId);
+                return;
+            } catch (NumberFormatException e) {
+                // action no es un número, continúa con el flujo normal
+            }
+
+            switch (action) {
+                case "add":
+                    if (param != null) {
+                        // Formato: carrito add producto_id cantidad
+                        String[] params = comando.split("\\s+");
+                        if (params.length >= 4) {
+                            try {
+                                int productoId = Integer.parseInt(params[2]);
+                                int cantidad = Integer.parseInt(params[3]);
+
+                                if (dCarrito.agregarProducto(clienteId, productoId, cantidad)) {
+                                    sendSimpleResponse(senderEmail, "✅ Producto Agregado",
+                                            String.format("Producto #%d agregado al carrito exitosamente (cantidad: %d).\n\n" +
+                                                    "📋 PRÓXIMOS PASOS:\n" +
+                                                    "• carrito get - Ver tu carrito completo\n" +
+                                                    "• checkout - Crear orden de compra\n" +
+                                                    "• tipos_pago get - Ver métodos de pago",
+                                                    productoId, cantidad),
+                                            originalSubject, messageId);
+                                } else {
+                                    sendSimpleResponse(senderEmail, "❌ Error Agregando Producto",
+                                            String.format("No se pudo agregar el producto #%d al carrito.\n\n" +
+                                                    "🔍 POSIBLES CAUSAS:\n" +
+                                                    "• Producto no existe en inventario\n" +
+                                                    "• Stock insuficiente (cantidad solicitada: %d)\n" +
+                                                    "• Error temporal de base de datos\n\n" +
+                                                    "💡 Usa 'producto get %d' para verificar disponibilidad",
+                                                    productoId, cantidad, productoId),
+                                            originalSubject, messageId);
+                                }
+                            } catch (NumberFormatException e) {
+                                sendSimpleResponse(senderEmail, "❌ Error de Formato",
+                                        String.format("Los parámetros deben ser números enteros.\n\n" +
+                                                "❌ Recibido: '%s'\n" +
+                                                "✅ Formato correcto: carrito add [numero_producto] [numero_cantidad]\n" +
+                                                "✅ Ejemplo: carrito add 161 3\n\n" +
+                                                "💡 Asegúrate de usar números sin corchetes ni caracteres especiales",
+                                                comando),
+                                        originalSubject, messageId);
+                            }
+                        } else {
+                            sendSimpleResponse(senderEmail, "❌ Parámetros Insuficientes",
+                                    String.format("Comando incompleto: '%s'\n\n" +
+                                            "✅ FORMATO COMPLETO:\n" +
+                                            "carrito add [producto_id] [cantidad]\n\n" +
+                                            "✅ EJEMPLO:\n" +
+                                            "carrito add 161 3\n\n" +
+                                            "💡 Necesitas especificar tanto el ID del producto como la cantidad",
+                                            comando),
+                                    originalSubject, messageId);
+                        }
+                    } else {
+                        sendSimpleResponse(senderEmail, "❌ Parámetros Faltantes",
+                                "Formato: carrito add [producto_id] [cantidad]\n\n" +
+                                        "✅ EJEMPLO: carrito add 161 3\n\n" +
+                                        "📋 Para ver productos disponibles usa: producto get",
+                                originalSubject, messageId);
+                    }
+                    break;
+
+                case "get":
+                    // Mostrar contenido del carrito
+                    List<String[]> carrito = dCarrito.obtenerCarrito(clienteId);
+                    if (carrito.isEmpty()) {
+                        sendSimpleResponse(senderEmail, "🛒 Carrito Vacío",
+                                "Tu carrito está vacío. Usa 'carrito add [producto_id] [cantidad]' para agregar productos.",
+                                originalSubject, messageId);
+                    } else {
+                        double total = dCarrito.obtenerTotalCarrito(clienteId);
+                        String titulo = String.format("🛒 Tu Carrito - Total: $%.2f", total);
+                        sendTableResponse(senderEmail, titulo, DCarrito.DETALLE_HEADERS,
+                                (ArrayList<String[]>) carrito, comando, originalSubject, messageId);
+                    }
+                    break;
+
+                case "remove":
+                    if (param != null) {
+                        try {
+                            int productoId = Integer.parseInt(param);
+                            if (dCarrito.removerProducto(clienteId, productoId)) {
+                                sendSimpleResponse(senderEmail, "✅ Producto Removido",
+                                        "Producto removido del carrito exitosamente.", originalSubject, messageId);
+                            } else {
+                                sendSimpleResponse(senderEmail, "❌ Error",
+                                        "No se pudo remover el producto del carrito.", originalSubject, messageId);
+                            }
+                        } catch (NumberFormatException e) {
+                            sendSimpleResponse(senderEmail, "❌ Error",
+                                    "ID de producto inválido.", originalSubject, messageId);
+                        }
+                    } else {
+                        sendSimpleResponse(senderEmail, "❌ Parámetro faltante",
+                                "Formato: carrito remove [producto_id]", originalSubject, messageId);
+                    }
+                    break;
+
+                case "clear":
+                    if (dCarrito.vaciarCarrito(clienteId)) {
+                        sendSimpleResponse(senderEmail, "✅ Carrito Vaciado",
+                                "Tu carrito ha sido vaciado exitosamente.", originalSubject, messageId);
+                    } else {
+                        sendSimpleResponse(senderEmail, "❌ Error",
+                                "No se pudo vaciar el carrito.", originalSubject, messageId);
+                    }
+                    break;
+
+                default:
+                    // 🆕 DETECTAR AQUÍ TAMBIÉN si es un número
+                    try {
+                        Integer.parseInt(action);
+                        sendSimpleResponse(senderEmail, "❌ Comando Incompleto",
+                                String.format("Formato incorrecto: '%s'\n\n" +
+                                        "✅ FORMATO CORRECTO:\n" +
+                                        "carrito add %s %s\n\n" +
+                                        "📋 COMANDOS DISPONIBLES:\n" +
+                                        "• carrito add [producto_id] [cantidad] - Agregar producto\n" +
+                                        "• carrito get - Ver carrito\n" +
+                                        "• carrito remove [producto_id] - Remover producto\n" +
+                                        "• carrito clear - Vaciar carrito\n\n" +
+                                        "💡 Te faltó especificar la acción 'add'",
+                                        comando, action, param != null ? param : "[cantidad]"),
+                                originalSubject, messageId);
+                    } catch (NumberFormatException e) {
+                        // No es un número, es una acción inválida
+                        sendSimpleResponse(senderEmail, "❌ Acción no válida",
+                                "Acciones disponibles: add, get, remove, clear", originalSubject, messageId);
+                    }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("❌ Error SQL en carrito: " + ex.getMessage());
+            sendErrorEmail(senderEmail, "Error de base de datos: " + ex.getMessage(), originalSubject, messageId);
+        }
+    }
+
+    /**
+     * Obtiene el ID del cliente basado en su email
+     */
+    private int obtenerClienteIdPorEmail(String email) {
+        try {
+            System.out.println("🔍 Buscando cliente para email: " + email);
+
+            // Primero obtener el usuario por email
+            DUsuario dUser = new DUsuario();
+            if (!dUser.existsByEmail(email)) {
+                System.out.println("❌ Usuario no existe: " + email);
+                return 0;
+            }
+
+            // Obtener el usuario para conseguir su ID
+            List<String[]> usuarios = nUsuario.getByEmail(email);
+            if (usuarios.isEmpty()) {
+                System.out.println("❌ No se pudo obtener datos del usuario: " + email);
+                return 0;
+            }
+
+            String userId = usuarios.get(0)[0]; // ID del usuario
+            System.out.println("✅ Usuario encontrado - ID: " + userId + ", Email: " + email);
+
+            // Buscar cliente asociado usando consulta SQL directa
+            try {
+                DCliente dClienteTemp = new DCliente();
+                List<String[]> clientes = dClienteTemp.list();
+                System.out.println("📋 Total clientes en sistema: " + clientes.size());
+
+                for (String[] cliente : clientes) {
+                    System.out.println("🔍 Revisando cliente ID: " + cliente[0] + ", user_id: " + cliente[1]);
+                    if (cliente[1].equals(userId)) { // user_id está en la posición 1
+                        int clienteId = Integer.parseInt(cliente[0]);
+                        System.out.println("✅ Cliente encontrado - ID: " + clienteId + " para usuario: " + userId);
+                        return clienteId;
+                    }
+                }
+
+                System.out.println("❌ No se encontró cliente asociado al usuario ID: " + userId);
+
+            } catch (Exception e) {
+                System.err.println("❌ Error buscando cliente: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error obteniendo cliente por email: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Procesa comando de checkout
+     */
+    private void processCheckoutCommand(String senderEmail, String comando, String originalSubject, String messageId) {
+        try {
+            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            if (clienteId == 0) {
+                sendSimpleResponse(senderEmail, "❌ Error",
+                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                return;
+            }
+
+            int ventaId = dVenta.procesarCheckout(clienteId);
+            sendSimpleResponse(senderEmail, "✅ Checkout Exitoso",
+                    String.format("Tu orden #%d ha sido creada. Usa 'pago %d [tipo_pago_id]' para completar la compra.",
+                            ventaId, ventaId),
+                    originalSubject, messageId);
+
+        } catch (SQLException ex) {
+            System.err.println("❌ Error SQL en checkout: " + ex.getMessage());
+            sendErrorEmail(senderEmail, "Error en checkout: " + ex.getMessage(), originalSubject, messageId);
+        } catch (Exception e) {
+            System.err.println("❌ Error en checkout: " + e.getMessage());
+            sendErrorEmail(senderEmail, "Error procesando checkout: " + e.getMessage(), originalSubject, messageId);
+        }
+    }
+
+    /**
+     * Procesa comandos de pago
+     */
+    private void processPagoCommand(String senderEmail, String action, String param, String comando,
+            String originalSubject, String messageId) {
+        try {
+            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            if (clienteId == 0) {
+                sendSimpleResponse(senderEmail, "❌ Error",
+                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                return;
+            }
+
+            if (param != null) {
+                String[] params = comando.split("\\s+");
+                if (params.length >= 3) {
+                    try {
+                        int ventaId = Integer.parseInt(params[1]);
+                        int tipoPagoId = Integer.parseInt(params[2]);
+
+                        if (dVenta.completarVenta(ventaId, tipoPagoId, clienteId)) {
+                            sendSimpleResponse(senderEmail, "✅ Pago Completado",
+                                    String.format("¡Compra exitosa! Tu orden #%d ha sido pagada y procesada. " +
+                                            "El stock ha sido actualizado automáticamente.", ventaId),
+                                    originalSubject, messageId);
+                        } else {
+                            sendSimpleResponse(senderEmail, "❌ Error en Pago",
+                                    "No se pudo procesar el pago.", originalSubject, messageId);
+                        }
+                    } catch (NumberFormatException e) {
+                        sendSimpleResponse(senderEmail, "❌ Error",
+                                "IDs inválidos. Formato: pago [venta_id] [tipo_pago_id]", originalSubject, messageId);
+                    }
+                } else {
+                    sendSimpleResponse(senderEmail, "❌ Parámetros insuficientes",
+                            "Formato: pago [venta_id] [tipo_pago_id]", originalSubject, messageId);
+                }
+            } else {
+                sendSimpleResponse(senderEmail, "❌ Parámetros faltantes",
+                        "Formato: pago [venta_id] [tipo_pago_id]. Usa 'tipos_pago get' para ver opciones.",
+                        originalSubject, messageId);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("❌ Error SQL en pago: " + ex.getMessage());
+            sendErrorEmail(senderEmail, "Error de base de datos: " + ex.getMessage(), originalSubject, messageId);
+        } catch (Exception e) {
+            System.err.println("❌ Error en pago: " + e.getMessage());
+            sendErrorEmail(senderEmail, "Error procesando pago: " + e.getMessage(), originalSubject, messageId);
+        }
+    }
+
+    /**
+     * Procesa comandos de ventas/compras
+     */
+    private void processVentasCommand(String senderEmail, String action, String param, String comando,
+            String originalSubject, String messageId) {
+        try {
+            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            if (clienteId == 0) {
+                sendSimpleResponse(senderEmail, "❌ Error",
+                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                return;
+            }
+
+            if ("get".equals(action)) {
+                if (param != null) {
+                    // Ver detalle de una venta específica
+                    try {
+                        int ventaId = Integer.parseInt(param);
+                        List<String[]> detalle = dVenta.obtenerDetalleVenta(ventaId, clienteId);
+
+                        if (detalle.isEmpty()) {
+                            sendSimpleResponse(senderEmail, "❌ Venta no encontrada",
+                                    "No se encontró la venta especificada o no tienes permisos para verla.",
+                                    originalSubject, messageId);
+                        } else {
+                            sendTableResponse(senderEmail, "📋 Detalle de Venta #" + ventaId,
+                                    DCarrito.DETALLE_HEADERS, (ArrayList<String[]>) detalle, comando,
+                                    originalSubject, messageId);
+                        }
+                    } catch (NumberFormatException e) {
+                        sendSimpleResponse(senderEmail, "❌ Error",
+                                "ID de venta inválido.", originalSubject, messageId);
+                    }
+                } else {
+                    // Ver historial de ventas
+                    List<String[]> historial = dVenta.obtenerHistorialVentas(clienteId);
+
+                    if (historial.isEmpty()) {
+                        sendSimpleResponse(senderEmail, "📋 Sin Compras",
+                                "No tienes compras registradas aún.", originalSubject, messageId);
+                    } else {
+                        String[] headers = { "ID", "Fecha", "Total", "Estado", "Método Pago" };
+                        sendTableResponse(senderEmail, "📋 Tu Historial de Compras", headers,
+                                (ArrayList<String[]>) historial, comando, originalSubject, messageId);
+                    }
+                }
+            } else {
+                sendSimpleResponse(senderEmail, "❌ Acción no válida",
+                        "Usa 'ventas get' para ver tu historial o 'ventas get [id]' para ver detalle.",
+                        originalSubject, messageId);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("❌ Error SQL en ventas: " + ex.getMessage());
+            sendErrorEmail(senderEmail, "Error de base de datos: " + ex.getMessage(), originalSubject, messageId);
+        } catch (Exception e) {
+            System.err.println("❌ Error en ventas: " + e.getMessage());
+            sendErrorEmail(senderEmail, "Error procesando consulta de ventas: " + e.getMessage(), originalSubject,
+                    messageId);
+        }
     }
 
     public static void main(String[] args) {

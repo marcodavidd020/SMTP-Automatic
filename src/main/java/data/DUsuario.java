@@ -166,7 +166,7 @@ public class DUsuario {
     }
 
     /**
-     * Registra un nuevo usuario
+     * Registra un nuevo usuario y crea automáticamente un cliente asociado
      */
     public List<String[]> register(String nombre, String apellido, String telefono, String genero, String email) throws SQLException {
         // Verificar si el email ya existe
@@ -177,24 +177,66 @@ public class DUsuario {
         String fullName = nombre + " " + apellido;
         String defaultPassword = "temp123"; // Contraseña temporal
 
-        String query = "INSERT INTO users (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
-        try (Connection conn = connection.connect();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, fullName);
-            ps.setString(2, email);
-            ps.setString(3, defaultPassword);
+        Connection conn = null;
+        try {
+            conn = connection.connect();
+            conn.setAutoCommit(false); // Iniciar transacción
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int id = rs.getInt(1);
-                System.out.println("✅ Usuario registrado exitosamente: " + email + " (ID: " + id + ")");
-                return get(id);
-            } else {
-                throw new SQLException("Error al registrar usuario. No se pudo recuperar el ID.");
+            // 1. Crear usuario
+            String userQuery = "INSERT INTO users (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
+            int userId;
+            try (PreparedStatement ps = conn.prepareStatement(userQuery)) {
+                ps.setString(1, fullName);
+                ps.setString(2, email);
+                ps.setString(3, defaultPassword);
+
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    userId = rs.getInt(1);
+                    System.out.println("✅ Usuario registrado exitosamente: " + email + " (ID: " + userId + ")");
+                } else {
+                    throw new SQLException("Error al registrar usuario. No se pudo recuperar el ID.");
+                }
             }
+
+            // 2. Crear cliente asociado
+            String clientQuery = "INSERT INTO clientes (user_id, nit, created_at, updated_at, telefono, genero) VALUES (?, ?, NOW(), NOW(), ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(clientQuery)) {
+                ps.setInt(1, userId);
+                ps.setString(2, "AUTO-" + userId); // NIT automático
+                ps.setString(3, telefono);
+                ps.setString(4, genero);
+
+                int clienteResult = ps.executeUpdate();
+                if (clienteResult > 0) {
+                    System.out.println("✅ Cliente creado automáticamente para usuario ID: " + userId);
+                } else {
+                    throw new SQLException("Error al crear cliente asociado.");
+                }
+            }
+
+            conn.commit(); // Confirmar transacción
+            return get(userId);
+
         } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Revertir transacción en caso de error
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error en rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("❌ Error registrando usuario: " + e.getMessage());
             throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error cerrando conexión: " + closeEx.getMessage());
+                }
+            }
         }
     }
 }
