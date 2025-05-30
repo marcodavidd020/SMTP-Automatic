@@ -39,7 +39,7 @@ public class DCarrito {
         System.out.println("🔍 DCarrito: Verificando carrito activo para cliente " + clienteId);
         
         // Verificar si ya tiene un carrito activo
-        String checkSql = "SELECT id FROM Carrito WHERE cliente_id = ? AND estado = 'activo'";
+        String checkSql = "SELECT id FROM carritos WHERE cliente_id = ? AND estado = 'activo'";
         try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
             checkStmt.setInt(1, clienteId);
             ResultSet rs = checkStmt.executeQuery();
@@ -54,7 +54,7 @@ public class DCarrito {
         System.out.println("🆕 DCarrito: No hay carrito activo, creando nuevo carrito para cliente " + clienteId);
         
         // Crear nuevo carrito
-        String sql = "INSERT INTO Carrito (cliente_id, fecha, total, estado) VALUES (?, CURRENT_DATE, 0, 'activo') RETURNING id";
+        String sql = "INSERT INTO carritos (cliente_id, fecha, total, estado) VALUES (?, CURRENT_DATE, 0, 'activo') RETURNING id";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clienteId);
             ResultSet rs = stmt.executeQuery();
@@ -86,7 +86,7 @@ public class DCarrito {
         System.out.println("✅ DCarrito: Stock verificado correctamente");
 
         // Verificar si el producto ya está en el carrito
-        String checkSql = "SELECT cantidad FROM Detalle_carrito WHERE carrito_id = ? AND producto_id = ?";
+        String checkSql = "SELECT cantidad FROM detalle_carritos WHERE carrito_id = ? AND producto_id = ?";
         try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
             checkStmt.setInt(1, carritoId);
             checkStmt.setInt(2, productoId);
@@ -106,7 +106,7 @@ public class DCarrito {
         System.out.println("💰 DCarrito: Precio unitario: $" + precio + ", Total: $" + total);
 
         // Insertar nuevo detalle
-        String sql = "INSERT INTO Detalle_carrito (carrito_id, producto_id, cantidad, total) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO detalle_carritos (carrito_id, producto_id, cantidad, total) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, carritoId);
             stmt.setInt(2, productoId);
@@ -114,7 +114,7 @@ public class DCarrito {
             stmt.setDouble(4, total);
 
             int affected = stmt.executeUpdate();
-            System.out.println("📝 DCarrito: Filas afectadas en Detalle_carrito: " + affected);
+            System.out.println("📝 DCarrito: Filas afectadas en detalle_carritos: " + affected);
             
             if (affected > 0) {
                 actualizarTotalCarrito(carritoId);
@@ -134,8 +134,8 @@ public class DCarrito {
 
         String sql = """
                     SELECT p.nombre, dc.cantidad, p.precio_venta, dc.total, dc.producto_id
-                    FROM Carrito c
-                    JOIN Detalle_carrito dc ON c.id = dc.carrito_id
+                    FROM carritos c
+                    JOIN detalle_carritos dc ON c.id = dc.carrito_id
                     JOIN productos p ON dc.producto_id = p.id
                     WHERE c.cliente_id = ? AND c.estado = 'activo'
                     ORDER BY p.nombre
@@ -162,7 +162,7 @@ public class DCarrito {
      * Obtiene el total del carrito
      */
     public double obtenerTotalCarrito(int clienteId) throws SQLException {
-        String sql = "SELECT total FROM Carrito WHERE cliente_id = ? AND estado = 'activo'";
+        String sql = "SELECT total FROM carritos WHERE cliente_id = ? AND estado = 'activo'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clienteId);
             ResultSet rs = stmt.executeQuery();
@@ -179,8 +179,8 @@ public class DCarrito {
      */
     public boolean removerProducto(int clienteId, int productoId) throws SQLException {
         String sql = """
-                    DELETE FROM Detalle_carrito
-                    WHERE carrito_id = (SELECT id FROM Carrito WHERE cliente_id = ? AND estado = 'activo')
+                    DELETE FROM detalle_carritos
+                    WHERE carrito_id = (SELECT id FROM carritos WHERE cliente_id = ? AND estado = 'activo')
                     AND producto_id = ?
                 """;
 
@@ -206,8 +206,8 @@ public class DCarrito {
      */
     public boolean vaciarCarrito(int clienteId) throws SQLException {
         String sql = """
-                    DELETE FROM Detalle_carrito
-                    WHERE carrito_id = (SELECT id FROM Carrito WHERE cliente_id = ? AND estado = 'activo')
+                    DELETE FROM detalle_carritos
+                    WHERE carrito_id = (SELECT id FROM carritos WHERE cliente_id = ? AND estado = 'activo')
                 """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -263,7 +263,7 @@ public class DCarrito {
         double precio = obtenerPrecioProducto(productoId);
         double nuevoTotal = precio * nuevaCantidad;
 
-        String sql = "UPDATE Detalle_carrito SET cantidad = ?, total = ? WHERE carrito_id = ? AND producto_id = ?";
+        String sql = "UPDATE detalle_carritos SET cantidad = ?, total = ? WHERE carrito_id = ? AND producto_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, nuevaCantidad);
             stmt.setDouble(2, nuevoTotal);
@@ -280,7 +280,7 @@ public class DCarrito {
     }
 
     private void actualizarTotalCarrito(int carritoId) throws SQLException {
-        String sql = "UPDATE Carrito SET total = (SELECT COALESCE(SUM(total), 0) FROM Detalle_carrito WHERE carrito_id = ?) WHERE id = ?";
+        String sql = "UPDATE carritos SET total = (SELECT COALESCE(SUM(total), 0) FROM detalle_carritos WHERE carrito_id = ?) WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, carritoId);
             stmt.setInt(2, carritoId);
@@ -289,7 +289,7 @@ public class DCarrito {
     }
 
     private int obtenerCarritoId(int clienteId) throws SQLException {
-        String sql = "SELECT id FROM Carrito WHERE cliente_id = ? AND estado = 'activo'";
+        String sql = "SELECT id FROM carritos WHERE cliente_id = ? AND estado = 'activo'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clienteId);
             ResultSet rs = stmt.executeQuery();

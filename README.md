@@ -533,7 +533,7 @@ help
 
 - **Nombre:** Marco David Toledo
 - **Email:** marcodavidtoledo@gmail.com
-- **Proyecto:** Sistema CRUD via Email v2.0
+- **Proyecto:** Sistema E-commerce por Email v2.0
 
 ### **🐛 Reportar Bugs**
 
@@ -592,8 +592,8 @@ psql -U postgres -d EcommerceTool -f sql/init_database.sql
 # Asunto: help
 ```
 
-**¡Tu sistema está listo! 🎉**
+**¡Tu sistema de e-commerce está listo! 🎉**
 
 ---
 
-_Documentación actualizada: Diciembre 2024 | v2.0 | Sistema de Email con Comandos CRUD_
+_Documentación actualizada: Diciembre 2024 | v2.0 | Sistema de E-commerce por Email_

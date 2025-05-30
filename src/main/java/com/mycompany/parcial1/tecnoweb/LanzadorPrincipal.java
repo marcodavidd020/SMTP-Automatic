@@ -19,10 +19,10 @@ public class LanzadorPrincipal {
         System.out.println("📧 Email: marcodavidtoledo@gmail.com");
         System.out.println();
         
-        mostrarOpciones();
+        mostrarMenu();
         
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Selecciona una opción (1-6): ");
+        System.out.print("Selecciona una opción (1-5): ");
         
         try {
             int opcion = scanner.nextInt();
@@ -35,44 +35,36 @@ public class LanzadorPrincipal {
         }
     }
     
-    private static void mostrarOpciones() {
-        System.out.println("📋 MODOS DISPONIBLES:");
+    private static void mostrarMenu() {
+        System.out.println("🎯 SELECCIONA UNA OPCIÓN:");
         System.out.println();
-        
-        System.out.println("🔧 VERSIÓN TECNOWEB (Original):");
-        System.out.println("1. 📧 EmailApp Tecnoweb - Procesa emails via POP3 desde mail.tecnoweb.org.bo");
-        
-        System.out.println();
-        System.out.println("🆕 VERSIÓN INDEPENDIENTE (Nueva):");
-        System.out.println("2. 🤖 Monitor Gmail con Comandos - Procesa comandos CRUD via email");
-        System.out.println("3. 🌐 Servidor HTTP Email - Interfaz web + API REST");
-        System.out.println("4. 🔄 Sistema Completo - Monitor Gmail + Servidor HTTP");
+        System.out.println("🛒 SISTEMA DE E-COMMERCE:");
+        System.out.println("1. 🤖 Monitor Gmail con E-commerce - Sistema completo de carrito y ventas");
+        System.out.println("2. 🌐 Servidor HTTP Email - Interfaz web + API REST");
+        System.out.println("3. 🔄 Sistema Completo - Monitor Gmail + Servidor HTTP");
         
         System.out.println();
         System.out.println("🛠️ HERRAMIENTAS:");
-        System.out.println("5. 📊 Test EmailApp Independiente - Prueba procesamiento de comandos");
-        System.out.println("6. ❓ Mostrar información del sistema");
+        System.out.println("4. 📊 Test EmailApp E-commerce - Prueba sistema de carrito");
+        System.out.println("5. ❓ Mostrar información del sistema");
         System.out.println();
     }
     
     private static void ejecutarOpcion(int opcion) {
         switch (opcion) {
             case 1:
-                ejecutarEmailAppTecnoweb();
-                break;
-            case 2:
                 ejecutarMonitorGmailComandos();
                 break;
-            case 3:
+            case 2:
                 ejecutarServidorHTTP();
                 break;
-            case 4:
+            case 3:
                 ejecutarSistemaCompleto();
                 break;
-            case 5:
+            case 4:
                 ejecutarTestEmailApp();
                 break;
-            case 6:
+            case 5:
                 mostrarInformacionSistema();
                 break;
             default:
@@ -80,45 +72,18 @@ public class LanzadorPrincipal {
         }
     }
     
-    private static void ejecutarEmailAppTecnoweb() {
-        System.out.println("\n🔧 Iniciando EmailApp TECNOWEB...");
-        System.out.println("📧 Servidor: mail.tecnoweb.org.bo");
-        System.out.println("🗄️ Base de datos: " + DBConnection.TecnoWeb.database);
-        System.out.println("⚠️ NOTA: Este modo puede no funcionar si mail.tecnoweb.org.bo está inaccesible");
-        
-        // Cambiar temporalmente la configuración a tecnoweb
-        String originalDb = DBConnection.database;
-        String originalServer = DBConnection.server;
-        String originalUser = DBConnection.user;
-        String originalPassword = DBConnection.password;
-        
-        DBConnection.database = DBConnection.TecnoWeb.database;
-        DBConnection.server = DBConnection.TecnoWeb.server;
-        DBConnection.user = DBConnection.TecnoWeb.user;
-        DBConnection.password = DBConnection.TecnoWeb.password;
-        
-        try {
-            EmailApp app = new EmailApp();
-            app.start();
-        } finally {
-            // Restaurar configuración original
-            DBConnection.database = originalDb;
-            DBConnection.server = originalServer;
-            DBConnection.user = originalUser;
-            DBConnection.password = originalPassword;
-        }
-    }
-    
     private static void ejecutarMonitorGmailComandos() {
-        System.out.println("\n🤖 Iniciando Monitor Gmail con Comandos...");
+        System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce...");
         System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
         System.out.println("🗄️ Base de datos: " + DBConnection.database + " en " + DBConnection.server);
-        System.out.println("🎯 Solo responde a comandos específicos en el asunto");
+        System.out.println("🛒 Sistema completo de carrito, checkout y pagos");
         System.out.println();
-        System.out.println("📝 COMANDOS DISPONIBLES:");
-        System.out.println("   • 'usuario get' - Lista todos los usuarios");
-        System.out.println("   • 'usuario get 1' - Obtiene usuario por ID");
-        System.out.println("   • 'help' - Muestra ayuda");
+        System.out.println("📝 COMANDOS DE E-COMMERCE DISPONIBLES:");
+        System.out.println("   🔐 REGISTRO: 'registrar Juan Pérez 123456789 masculino'");
+        System.out.println("   📋 CONSULTAS: 'productos get', 'categorias get', 'tipos_pago get'");
+        System.out.println("   🛒 CARRITO: 'carrito add 161 3', 'carrito get', 'carrito clear'");
+        System.out.println("   💳 COMPRAS: 'checkout', 'pago 123 1', 'ventas get'");
+        System.out.println("   ❓ AYUDA: 'help'");
         System.out.println();
         
         GmailMonitorComandos monitor = new GmailMonitorComandos();
@@ -171,7 +136,7 @@ public class LanzadorPrincipal {
     }
     
     private static void ejecutarTestEmailApp() {
-        System.out.println("\n📊 Ejecutando Test EmailApp Independiente...");
+        System.out.println("\n📊 Ejecutando Test EmailApp E-commerce...");
         System.out.println("🗄️ Base de datos: " + DBConnection.database);
         
         EmailAppIndependiente app = new EmailAppIndependiente();

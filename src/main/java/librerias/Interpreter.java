@@ -59,20 +59,11 @@ public class Interpreter implements Runnable {
             case Token.USUARIO:
                 IcasoUsoListener.usuario(paramsAction);
                 break;
-            case Token.EVENTO:
-                IcasoUsoListener.evento(paramsAction);
-                break;
-            case Token.RESERVA:
-                IcasoUsoListener.reserva(paramsAction);
-                break;
             case Token.PAGO:
                 IcasoUsoListener.pago(paramsAction);
                 break;
             case Token.PROVEEDOR:
                 IcasoUsoListener.proveedor(paramsAction);
-                break;
-            case Token.PROMOCION:
-                IcasoUsoListener.promocion(paramsAction);
                 break;
             case Token.PATROCINADOR:
                 IcasoUsoListener.patrocinador(paramsAction);
@@ -86,17 +77,14 @@ public class Interpreter implements Runnable {
             case Token.SERVICIO:
                 IcasoUsoListener.servicio(paramsAction);
                 break;
-            case Token.DETALLEEVENTO:
-                IcasoUsoListener.detalleEvento(paramsAction);
-                break;
             case Token.PRODUCTO:
                 // Usar reflection para llamar al método producto si existe
                 try {
                     java.lang.reflect.Method method = IcasoUsoListener.getClass().getMethod("producto", ParamsAction.class);
                     method.invoke(IcasoUsoListener, paramsAction);
                 } catch (Exception e) {
-                    // Si no existe el método, usar evento como fallback
-                    IcasoUsoListener.evento(paramsAction);
+                    // Si no existe el método, usar servicio como fallback
+                    IcasoUsoListener.servicio(paramsAction);
                 }
                 break;
             case Token.CATEGORIA:

@@ -464,65 +464,32 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             String[] headers = { "Comando", "Disponible", "Descripción" };
             ArrayList<String[]> data = new ArrayList<>();
 
-            // Comandos de registro y autenticación
-            data.add(new String[] { "registrar nombre apellido telefono genero", "✅ SÍ", "Registrarse en el sistema" });
+            // Comandos disponibles del sistema de e-commerce
+            data.add(new String[] { "usuario get", "✅ SÍ", "Lista todos los usuarios" });
+            data.add(new String[] { "usuario get <id>", "✅ SÍ", "Usuario por ID" });
+            data.add(new String[] { "producto get", "✅ SÍ", "Lista todos los productos" });
+            data.add(new String[] { "producto get <id>", "✅ SÍ", "Producto por ID" });
+            data.add(new String[] { "categoria get", "✅ SÍ", "Lista todas las categorías" });
+            data.add(new String[] { "categoria get <id>", "✅ SÍ", "Categoría por ID" });
+            data.add(new String[] { "cliente get", "✅ SÍ", "Lista todos los clientes" });
+            data.add(new String[] { "cliente get <id>", "✅ SÍ", "Cliente por ID" });
+            data.add(new String[] { "tipo_pago get", "✅ SÍ", "Lista todos los tipos de pago" });
+            data.add(new String[] { "tipo_pago get <id>", "✅ SÍ", "Tipo de pago por ID" });
 
-            // Comandos de consulta (GET) - Ahora con soporte singular/plural
-            data.add(new String[] { "usuario get / usuarios get", "✅ SÍ", "Lista todos los usuarios" });
-            data.add(new String[] { "usuario get <id> / usuarios get <id>", "✅ SÍ", "Usuario específico por ID" });
-            data.add(new String[] { "producto get / productos get", "✅ SÍ", "Lista todos los productos" });
-            data.add(new String[] { "producto get <id> / productos get <id>", "✅ SÍ", "Producto específico por ID" });
-            data.add(new String[] { "categoria get / categorias get", "✅ SÍ", "Lista todas las categorías" });
-            data.add(
-                    new String[] { "categoria get <id> / categorias get <id>", "✅ SÍ", "Categoría específica por ID" });
-            data.add(new String[] { "cliente get / clientes get", "✅ SÍ", "Lista todos los clientes" });
-            data.add(new String[] { "cliente get <id> / clientes get <id>", "✅ SÍ", "Cliente específico por ID" });
-            data.add(new String[] { "tipo_pago get / tipos_pago get", "✅ SÍ", "Lista todos los tipos de pago" });
-            data.add(new String[] { "tipo_pago get <id> / tipos_pago get <id>", "✅ SÍ",
-                    "Tipo de pago específico por ID" });
-
-            // 🆕 COMANDOS DEL SISTEMA DE E-COMMERCE
-            data.add(new String[] { "", "", "" });
-            data.add(new String[] { "🛒 SISTEMA DE E-COMMERCE:", "", "" });
-            data.add(new String[] { "carrito add [producto_id] [cantidad]", "✅ SÍ", "Agregar producto al carrito" });
+            // Comandos del sistema de carrito y e-commerce
+            data.add(new String[] { "carrito add [id] [cantidad]", "✅ SÍ", "Agregar producto al carrito" });
             data.add(new String[] { "carrito get", "✅ SÍ", "Ver contenido del carrito" });
-            data.add(new String[] { "carrito remove [producto_id]", "✅ SÍ", "Remover producto del carrito" });
+            data.add(new String[] { "carrito remove [id]", "✅ SÍ", "Remover producto del carrito" });
             data.add(new String[] { "carrito clear", "✅ SÍ", "Vaciar carrito completo" });
             data.add(new String[] { "checkout", "✅ SÍ", "Crear orden de compra" });
-            data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago de orden" });
+            data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago" });
             data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
-            data.add(new String[] { "ventas get [venta_id]", "✅ SÍ", "Ver detalle de compra específica" });
 
-            // Comandos de administración (próximamente)
-            data.add(new String[] { "", "", "" });
-            data.add(new String[] { "⏳ EN DESARROLLO:", "", "" });
-            data.add(new String[] { "producto add nombre precio_compra precio_venta descripcion categoria_id",
-                    "⏳ DESARROLLO", "Agregar nuevo producto" });
-            data.add(new String[] { "categoria add nombre descripcion", "⏳ DESARROLLO", "Agregar nueva categoría" });
-            data.add(new String[] { "cliente add nit user_id", "⏳ DESARROLLO", "Agregar nuevo cliente" });
-            data.add(new String[] { "tipo_pago add tipo_pago", "⏳ DESARROLLO", "Agregar tipo de pago" });
-
-            // Información adicional
-            data.add(new String[] { "", "", "" });
-            data.add(new String[] { "💡 NOVEDADES v2.0:", "", "" });
-            data.add(new String[] { "✅ Comandos en SINGULAR y PLURAL", "NUEVO",
-                    "usuario = usuarios, producto = productos" });
-            data.add(new String[] { "✅ Respuestas como REPLY", "NUEVO", "El sistema responde a tu email original" });
-            data.add(new String[] { "✅ Sistema de E-commerce", "NUEVO", "Carrito, checkout, pago y ventas" });
-            data.add(new String[] { "✅ Control de stock automático", "NUEVO", "Stock actualizado al comprar" });
-
-            // Comandos no implementados
-            data.add(new String[] { "", "", "" });
-            data.add(new String[] { "❌ NO IMPLEMENTADOS:", "", "" });
-            data.add(new String[] { "evento *", "❌ NO", "Gestión de eventos - No implementado" });
-            data.add(new String[] { "reserva *", "❌ NO", "Gestión de reservas - No implementado" });
-            data.add(new String[] { "promocion *", "❌ NO", "Gestión de promociones - No implementado" });
-
-            sendTableResponse(senderEmail, "📚 Comandos Disponibles - Sistema E-commerce v2.0", headers, data, comando,
+            sendTableResponse(senderEmail, "Comandos disponibles - Sistema E-commerce", headers, data, comando,
                     originalSubject, messageId);
         } catch (Exception ex) {
-            System.err.println("❌ Error en help: " + ex.getMessage());
-            sendErrorEmail(senderEmail, "Error: " + ex.getMessage(), originalSubject, messageId);
+            handleError(CONSTRAINTS_ERROR, senderEmail, Collections.singletonList("Error: " + ex.getMessage()),
+                    null, null);
         }
     }
 
@@ -630,19 +597,6 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         processUsuarioCommand(event.getSender(), "get", null, event.getCommand(), null, null);
     }
 
-    // Implementación para eventos (mantener original)
-    @Override
-    public void evento(ParamsAction event) {
-        sendSimpleResponse(event.getSender(), "Comando no disponible",
-                "El comando 'evento' aún no está implementado en el servidor independiente.", null, null);
-    }
-
-    @Override
-    public void reserva(ParamsAction event) {
-        sendSimpleResponse(event.getSender(), "Comando no disponible",
-                "El comando 'reserva' aún no está implementado en el servidor independiente.", null, null);
-    }
-
     @Override
     public void pago(ParamsAction event) {
         sendSimpleResponse(event.getSender(), "Comando no disponible",
@@ -653,12 +607,6 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     public void proveedor(ParamsAction event) {
         sendSimpleResponse(event.getSender(), "Comando no disponible",
                 "El comando 'proveedor' aún no está implementado en el servidor independiente.", null, null);
-    }
-
-    @Override
-    public void promocion(ParamsAction event) {
-        sendSimpleResponse(event.getSender(), "Comando no disponible",
-                "El comando 'promocion' aún no está implementado en el servidor independiente.", null, null);
     }
 
     @Override
@@ -713,12 +661,6 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     }
 
     @Override
-    public void detalleEvento(ParamsAction event) {
-        sendSimpleResponse(event.getSender(), "Comando no disponible",
-                "El comando 'detalleEvento' aún no está implementado en el servidor independiente.", null, null);
-    }
-
-    @Override
     public void error(ParamsAction event) {
         handleError(event.getAction(), event.getSender(), event.getParams(), null, null);
     }
@@ -729,7 +671,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             String[] headers = { "Comando", "Disponible", "Descripción" };
             ArrayList<String[]> data = new ArrayList<>();
 
-            // Comandos disponibles
+            // Comandos disponibles del sistema de e-commerce
             data.add(new String[] { "usuario get", "✅ SÍ", "Lista todos los usuarios" });
             data.add(new String[] { "usuario get <id>", "✅ SÍ", "Usuario por ID" });
             data.add(new String[] { "producto get", "✅ SÍ", "Lista todos los productos" });
@@ -741,13 +683,16 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "tipo_pago get", "✅ SÍ", "Lista todos los tipos de pago" });
             data.add(new String[] { "tipo_pago get <id>", "✅ SÍ", "Tipo de pago por ID" });
 
-            // Comandos no disponibles
-            data.add(new String[] { "usuario add/modify/delete", "⏳ DESARROLLO", "CRUD de usuarios" });
-            data.add(new String[] { "evento", "❌ NO", "Aún no implementado" });
-            data.add(new String[] { "reserva", "❌ NO", "Aún no implementado" });
-            data.add(new String[] { "pago", "❌ NO", "Aún no implementado" });
+            // Comandos del sistema de carrito y e-commerce
+            data.add(new String[] { "carrito add [id] [cantidad]", "✅ SÍ", "Agregar producto al carrito" });
+            data.add(new String[] { "carrito get", "✅ SÍ", "Ver contenido del carrito" });
+            data.add(new String[] { "carrito remove [id]", "✅ SÍ", "Remover producto del carrito" });
+            data.add(new String[] { "carrito clear", "✅ SÍ", "Vaciar carrito completo" });
+            data.add(new String[] { "checkout", "✅ SÍ", "Crear orden de compra" });
+            data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago" });
+            data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
 
-            sendTableResponse(event.getSender(), "Comandos disponibles - Servidor Independiente", headers, data,
+            sendTableResponse(event.getSender(), "Comandos disponibles - Sistema E-commerce", headers, data,
                     event.getCommand(), null, null);
         } catch (Exception ex) {
             handleError(CONSTRAINTS_ERROR, event.getSender(), Collections.singletonList("Error: " + ex.getMessage()),
