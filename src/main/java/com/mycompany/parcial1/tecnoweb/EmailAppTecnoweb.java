@@ -21,7 +21,7 @@ import servidor.GmailRelay;
 /**
  * EmailApp original que se conecta al servidor tecnoweb usando POP3
  * y la base de datos tecnoweb (db_grupo21sc en mail.tecnoweb.org.bo)
- * 
+ *
  * @author MARCO
  */
 public class EmailAppTecnoweb implements ICasoUsoListener {

@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
@@ -24,7 +23,7 @@ import librerias.Email;
 
 /**
  * Clase de envío de emails que puede usar diferentes servidores SMTP
- * 
+ *
  * @author MARCO
  */
 public class EmailSend implements Runnable {
@@ -42,7 +41,7 @@ public class EmailSend implements Runnable {
      */
 
     // Opción 2: Tecnoweb (ACTIVO para EmailApp Tecnoweb)
-    private final static String PORT_SMTP = "25";
+    private final static String PORT_SMTP = "25"; // Puerto SMTP estándar (CONFIRMADO FUNCIONAL)
     private final static String HOST = "mail.tecnoweb.org.bo";
     private final static String MAIL = "grupo21sc@tecnoweb.org.bo";
     private final static boolean USE_AUTH = false;
@@ -61,22 +60,30 @@ public class EmailSend implements Runnable {
         Properties properties = new Properties();
         properties.setProperty("mail.smtp.host", HOST);
         properties.setProperty("mail.smtp.port", PORT_SMTP);
-        properties.setProperty("mail.smtp.auth", String.valueOf(USE_AUTH));
+        properties.setProperty("mail.smtp.auth", "false"); // Sin autenticación
 
-        // Configuración básica sin cifrado para servidores locales
+        // Configuración específica para tecnoweb - servidor con restricciones
         properties.setProperty("mail.smtp.starttls.enable", "false");
         properties.setProperty("mail.smtp.ssl.enable", "false");
+        properties.setProperty("mail.smtp.ssl.trust", "*");
+        properties.setProperty("mail.smtp.connectiontimeout", "60000"); // 60 segundos
+        properties.setProperty("mail.smtp.timeout", "60000"); // 60 segundos
+        properties.setProperty("mail.smtp.writetimeout", "60000"); // 60 segundos
 
-        Session session;
-        if (USE_AUTH) {
-            session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(USER, MAIL_PASSWORD);
-                }
-            });
-        } else {
-            session = Session.getDefaultInstance(properties, null);
-        }
+        // Configuración adicional para servidores restrictivos
+        properties.setProperty("mail.smtp.localhost", "localhost");
+        properties.setProperty("mail.smtp.ehlo", "false"); // Usar HELO en lugar de EHLO
+        properties.setProperty("mail.debug", "true"); // Debug para ver qué pasa
+
+        // Para servidores que no requieren autenticación como tecnoweb
+        System.out.println("🔧 Configurando SMTP sin autenticación:");
+        System.out.println("   🌐 Host: " + HOST);
+        System.out.println("   🔌 Puerto: " + PORT_SMTP);
+        System.out.println("   🔐 Auth: false");
+        System.out.println("   🔒 SSL/TLS: false");
+
+        // Crear sesión SIN autenticación
+        Session session = Session.getInstance(properties, null);
 
         try {
             MimeMessage message = new MimeMessage(session);

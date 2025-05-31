@@ -9,7 +9,7 @@ import servidor.HTTPEmailServer;
 /**
  * Lanzador principal que permite elegir entre diferentes modos de
  * funcionamiento
- * 
+ *
  * @author MARCO
  */
 public class LanzadorPrincipal {
