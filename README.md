@@ -271,14 +271,16 @@ El sistema ahora responde automáticamente como **REPLY** al email original, cre
 ### **🔄 Cómo Funciona**
 
 **✅ ANTES (v1.0):**
+
 ```
 📧 Tu email: "usuario get"
 📧 Sistema crea: Email nuevo "Re: usuario get"
-📧 Tu email: "producto get"  
+📧 Tu email: "producto get"
 📧 Sistema crea: Email nuevo "Re: producto get"
 ```
 
 **🎉 AHORA (v2.0):**
+
 ```
 📧 Tu email: "usuario get"
    └── 💬 Sistema responde: Reply en la MISMA conversación
@@ -315,6 +317,7 @@ El sistema ahora responde automáticamente como **REPLY** al email original, cre
 #### **Detección de Comandos en Respuestas:**
 
 El sistema detecta comandos en:
+
 - ✅ **Asunto del email original**: `usuario get`
 - ✅ **Contenido de respuestas**: Escribes `producto get` como respuesta
 - ✅ **Líneas limpias**: Ignora texto citado (líneas con `>`)
@@ -323,6 +326,7 @@ El sistema detecta comandos en:
 ### **🛠️ Implementación Técnica**
 
 El sistema utiliza headers RFC estándar para el threading:
+
 - `In-Reply-To`: Referencia al Message-ID original
 - `References`: Cadena de conversación
 - `Subject`: Automáticamente prefijado con "Re:"

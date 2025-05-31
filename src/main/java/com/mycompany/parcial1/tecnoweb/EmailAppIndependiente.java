@@ -95,13 +95,14 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             System.out.println("   📧 From: " + senderEmail);
             System.out.println("   📝 Subject: " + subject);
             if (content != null && !content.trim().isEmpty()) {
-                System.out.println("   💬 Content preview: " + content.substring(0, Math.min(content.length(), 50)) + "...");
+                System.out.println(
+                        "   💬 Content preview: " + content.substring(0, Math.min(content.length(), 50)) + "...");
             }
             if (messageId != null) {
                 System.out.println("   🆔 Message-ID: " + messageId);
                 System.out.println("   💬 Responderá como REPLY al email original");
             }
-            
+
             // Verificar conexión antes de procesar
             if (!TestConnection.testConnection()) {
                 System.err.println("   ❌ Error de conexión a base de datos");
@@ -110,23 +111,23 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         originalSubject, messageId);
                 return;
             }
-            
+
             // Verificar si el comando es para registro (solo en subject)
             if (isRegistrationCommand(subject)) {
                 processRegistrationCommand(senderEmail, subject, originalSubject, messageId);
                 return;
             }
-            
+
             // Verificar si el usuario está registrado
             if (!isUserRegistered(senderEmail)) {
                 System.out.println("   ❌ Usuario no registrado: " + senderEmail);
                 sendWelcomeEmailAsReply(senderEmail, originalSubject, messageId);
                 return;
             }
-            
+
             // 🆕 BUSCAR COMANDOS EN SUBJECT Y CONTENT
             String comando = null;
-            
+
             // Primero buscar en el subject
             if (isCommandEmail(subject)) {
                 comando = subject.toLowerCase().trim();
@@ -140,16 +141,16 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     System.out.println("   ✅ Comando encontrado en CONTENT: " + comando);
                 }
             }
-            
+
             // Si no se encontró comando válido, omitir
             if (comando == null) {
                 System.out.println("   ⏭️ No se encontraron comandos válidos, omitiendo");
                 return;
             }
-            
+
             // Procesar comando encontrado
             processDirectCommand(senderEmail, comando, originalSubject, messageId);
-            
+
         } catch (Exception e) {
             System.err.println("❌ Error procesando comando: " + e.getMessage());
             sendErrorEmailAsReply(senderEmail, "Error procesando comando: " + e.getMessage(), originalSubject,
@@ -159,32 +160,33 @@ public class EmailAppIndependiente implements ICasoUsoListener {
 
     /**
      * 🆕 Extrae comando del contenido del email (para respuestas)
-     * Busca líneas que no empiecen con ">" (texto citado) y que contengan comandos válidos
+     * Busca líneas que no empiecen con ">" (texto citado) y que contengan comandos
+     * válidos
      */
     private String extractCommandFromContent(String content) {
         if (content == null || content.trim().isEmpty()) {
             return null;
         }
-        
+
         String[] lines = content.split("\n");
         for (String line : lines) {
             line = line.trim();
-            
+
             // Ignorar líneas vacías y texto citado (que empieza con >)
             if (line.isEmpty() || line.startsWith(">")) {
                 continue;
             }
-            
+
             // 🆕 LIMPIAR CORCHETES de los comandos
             line = line.replaceAll("\\[|\\]", "");
-            
+
             // Buscar primera línea que contenga un comando válido
             if (isCommandEmail(line)) {
                 System.out.println("   🔍 Línea de comando detectada: " + line);
                 return line.toLowerCase().trim();
             }
         }
-        
+
         return null;
     }
 
@@ -763,12 +765,14 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             if (clienteId == 0) {
                 sendSimpleResponse(senderEmail, "❌ Cliente No Configurado",
                         String.format("🔍 PROBLEMA DETECTADO:\n" +
-                                "Tu usuario (%s) está registrado en el sistema, pero no tienes un perfil de CLIENTE asociado.\n\n" +
+                                "Tu usuario (%s) está registrado en el sistema, pero no tienes un perfil de CLIENTE asociado.\n\n"
+                                +
                                 "📋 PARA RESOLVER ESTE PROBLEMA:\n" +
                                 "1. Contacta al administrador del sistema\n" +
                                 "2. Solicita que te creen un perfil de cliente\n" +
                                 "3. O envía un email con asunto: 'crear cliente para %s'\n\n" +
-                                "💡 El sistema requiere que tengas un perfil de cliente para poder realizar compras.\n\n" +
+                                "💡 El sistema requiere que tengas un perfil de cliente para poder realizar compras.\n\n"
+                                +
                                 "🔧 DETALLES TÉCNICOS:\n" +
                                 "- Email detectado: %s\n" +
                                 "- Usuario registrado: ✅ SÍ\n" +
@@ -783,7 +787,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             // Ejemplo: "carrito 147 2" debería ser "carrito add 147 2"
             try {
                 Integer.parseInt(action); // Si action es un número, falta la acción "add"
-                
+
                 sendSimpleResponse(senderEmail, "❌ Comando Incompleto",
                         String.format("Formato incorrecto: '%s'\n\n" +
                                 "✅ FORMATO CORRECTO:\n" +
@@ -813,11 +817,13 @@ public class EmailAppIndependiente implements ICasoUsoListener {
 
                                 if (dCarrito.agregarProducto(clienteId, productoId, cantidad)) {
                                     sendSimpleResponse(senderEmail, "✅ Producto Agregado",
-                                            String.format("Producto #%d agregado al carrito exitosamente (cantidad: %d).\n\n" +
-                                                    "📋 PRÓXIMOS PASOS:\n" +
-                                                    "• carrito get - Ver tu carrito completo\n" +
-                                                    "• checkout - Crear orden de compra\n" +
-                                                    "• tipos_pago get - Ver métodos de pago",
+                                            String.format(
+                                                    "Producto #%d agregado al carrito exitosamente (cantidad: %d).\n\n"
+                                                            +
+                                                            "📋 PRÓXIMOS PASOS:\n" +
+                                                            "• carrito get - Ver tu carrito completo\n" +
+                                                            "• checkout - Crear orden de compra\n" +
+                                                            "• tipos_pago get - Ver métodos de pago",
                                                     productoId, cantidad),
                                             originalSubject, messageId);
                                 } else {
@@ -835,7 +841,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                                 sendSimpleResponse(senderEmail, "❌ Error de Formato",
                                         String.format("Los parámetros deben ser números enteros.\n\n" +
                                                 "❌ Recibido: '%s'\n" +
-                                                "✅ Formato correcto: carrito add [numero_producto] [numero_cantidad]\n" +
+                                                "✅ Formato correcto: carrito add [numero_producto] [numero_cantidad]\n"
+                                                +
                                                 "✅ Ejemplo: carrito add 161 3\n\n" +
                                                 "💡 Asegúrate de usar números sin corchetes ni caracteres especiales",
                                                 comando),

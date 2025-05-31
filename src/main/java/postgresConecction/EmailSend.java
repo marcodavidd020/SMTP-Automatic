@@ -24,26 +24,29 @@ import librerias.Email;
 
 /**
  * Clase de envío de emails que puede usar diferentes servidores SMTP
+ * 
  * @author MARCO
  */
 public class EmailSend implements Runnable {
 
     // 🔧 CONFIGURACIÓN DEL SERVIDOR - Cambia según necesites
-    
-    // Opción 1: Servidor personalizado (recomendado)
-    private final static String PORT_SMTP = "2525";
-    private final static String HOST = "localhost"; // IP de tu servidor personalizado
-    private final static String MAIL = "admin@mi-servidor.local";
-    private final static boolean USE_AUTH = false; // Tu servidor no necesita auth
-    
-    /* 
-    // Opción 2: Tecnoweb (problemático)
+
+    /*
+     * // Opción 1: Servidor personalizado
+     * private final static String PORT_SMTP = "2525";
+     * private final static String HOST = "localhost"; // IP de tu servidor
+     * personalizado
+     * private final static String MAIL = "admin@mi-servidor.local";
+     * private final static boolean USE_AUTH = false; // Tu servidor no necesita
+     * auth
+     */
+
+    // Opción 2: Tecnoweb (ACTIVO para EmailApp Tecnoweb)
     private final static String PORT_SMTP = "25";
     private final static String HOST = "mail.tecnoweb.org.bo";
     private final static String MAIL = "grupo21sc@tecnoweb.org.bo";
     private final static boolean USE_AUTH = false;
-    */
-    
+
     private final static String USER = "grupo21sc";
     private final static String MAIL_PASSWORD = "grup021grup021*";
 
@@ -59,11 +62,11 @@ public class EmailSend implements Runnable {
         properties.setProperty("mail.smtp.host", HOST);
         properties.setProperty("mail.smtp.port", PORT_SMTP);
         properties.setProperty("mail.smtp.auth", String.valueOf(USE_AUTH));
-        
+
         // Configuración básica sin cifrado para servidores locales
         properties.setProperty("mail.smtp.starttls.enable", "false");
         properties.setProperty("mail.smtp.ssl.enable", "false");
-        
+
         Session session;
         if (USE_AUTH) {
             session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
@@ -74,11 +77,11 @@ public class EmailSend implements Runnable {
         } else {
             session = Session.getDefaultInstance(properties, null);
         }
-        
+
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(MAIL));
-            InternetAddress[] toAddresses = { new InternetAddress(email.getTo())};
+            InternetAddress[] toAddresses = { new InternetAddress(email.getTo()) };
 
             message.setRecipients(MimeMessage.RecipientType.TO, toAddresses);
             message.setSubject(email.getSubject());
@@ -93,13 +96,13 @@ public class EmailSend implements Runnable {
 
             Transport.send(message);
             System.out.println("✅ Email enviado exitosamente desde " + HOST + ":" + PORT_SMTP);
-            
+
         } catch (NoSuchProviderException | AddressException ex) {
             Logger.getLogger(EmailSend.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("❌ Error de dirección: " + ex.getMessage());
         } catch (MessagingException ex) {
             Logger.getLogger(EmailSend.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("❌ Error de conexión SMTP: " + ex.getMessage()); 
+            System.out.println("❌ Error de conexión SMTP: " + ex.getMessage());
             System.out.println("💡 Asegúrate de que el servidor SMTP esté ejecutándose en " + HOST + ":" + PORT_SMTP);
         }
     }
