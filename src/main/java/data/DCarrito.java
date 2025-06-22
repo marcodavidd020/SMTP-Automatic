@@ -106,12 +106,13 @@ public class DCarrito {
         System.out.println("💰 DCarrito: Precio unitario: $" + precio + ", Total: $" + total);
 
         // Insertar nuevo detalle
-        String sql = "INSERT INTO detalle_carritos (carrito_id, producto_id, cantidad, total) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO detalle_carritos (carrito_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, carritoId);
             stmt.setInt(2, productoId);
             stmt.setInt(3, cantidad);
-            stmt.setDouble(4, total);
+            stmt.setDouble(4, precio);
+            stmt.setDouble(5, total);
 
             int affected = stmt.executeUpdate();
             System.out.println("📝 DCarrito: Filas afectadas en detalle_carritos: " + affected);
@@ -133,7 +134,7 @@ public class DCarrito {
         List<String[]> resultado = new ArrayList<>();
 
         String sql = """
-                    SELECT p.nombre, dc.cantidad, p.precio_venta, dc.total, dc.producto_id
+                    SELECT p.nombre, dc.cantidad, p.precio_venta, dc.subtotal, dc.producto_id
                     FROM carritos c
                     JOIN detalle_carritos dc ON c.id = dc.carrito_id
                     JOIN productos p ON dc.producto_id = p.id
@@ -150,7 +151,7 @@ public class DCarrito {
                         rs.getString("nombre"),
                         String.valueOf(rs.getInt("cantidad")),
                         String.format("$%.2f", rs.getDouble("precio_venta")),
-                        String.format("$%.2f", rs.getDouble("total"))
+                        String.format("$%.2f", rs.getDouble("subtotal"))
                 });
             }
         }
@@ -263,7 +264,7 @@ public class DCarrito {
         double precio = obtenerPrecioProducto(productoId);
         double nuevoTotal = precio * nuevaCantidad;
 
-        String sql = "UPDATE detalle_carritos SET cantidad = ?, total = ? WHERE carrito_id = ? AND producto_id = ?";
+        String sql = "UPDATE detalle_carritos SET cantidad = ?, subtotal = ? WHERE carrito_id = ? AND producto_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, nuevaCantidad);
             stmt.setDouble(2, nuevoTotal);
@@ -280,7 +281,7 @@ public class DCarrito {
     }
 
     private void actualizarTotalCarrito(int carritoId) throws SQLException {
-        String sql = "UPDATE carritos SET total = (SELECT COALESCE(SUM(total), 0) FROM detalle_carritos WHERE carrito_id = ?) WHERE id = ?";
+        String sql = "UPDATE carritos SET total = (SELECT COALESCE(SUM(subtotal), 0) FROM detalle_carritos WHERE carrito_id = ?) WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, carritoId);
             stmt.setInt(2, carritoId);
