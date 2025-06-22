@@ -195,9 +195,14 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
      */
     private boolean isUserRegistered(String email) {
         try {
-            // TODO: Implementar verificación en base de datos tecnoweb
-            // Por ahora usar la implementación local pero será diferente
-            DUsuario dUser = new DUsuario();
+            // Usar configuración de Tecnoweb en lugar de localhost
+            DUsuario dUser = new DUsuario(
+                DBConnection.TecnoWeb.database,
+                DBConnection.TecnoWeb.server,
+                DBConnection.TecnoWeb.port,
+                DBConnection.TecnoWeb.user,
+                DBConnection.TecnoWeb.password
+            );
             return dUser.existsByEmail(email);
         } catch (Exception e) {
             System.err.println("❌ Error verificando usuario en tecnoweb: " + e.getMessage());

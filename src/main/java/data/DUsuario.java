@@ -16,8 +16,14 @@ public class DUsuario {
 
     private final SqlConnection connection;
 
+    // Constructor con configuración local (existente)
     public DUsuario() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    // Constructor con configuración personalizada (NUEVO para Tecnoweb)
+    public DUsuario(String database, String server, String port, String user, String password) {
+        this.connection = new SqlConnection(database, server, port, user, password);
     }
 
     public List<String[]> get(int id) throws SQLException {
