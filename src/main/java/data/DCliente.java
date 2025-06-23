@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DCliente {
@@ -18,6 +19,14 @@ public class DCliente {
 
     public DCliente() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DCliente(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DCliente createWithGlobalConfig() {
+        return new DCliente(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

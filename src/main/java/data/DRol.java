@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DRol {
@@ -17,6 +18,14 @@ public class DRol {
 
     public DRol() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DRol(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DRol createWithGlobalConfig() {
+        return new DRol(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

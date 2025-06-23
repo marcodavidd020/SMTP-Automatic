@@ -74,6 +74,22 @@
         padding: 12px;
         border-bottom: 1px solid #ecf0f1;
         font-size: 14px;
+        vertical-align: middle;
+    }
+    .image-cell {
+        text-align: center;
+        padding: 8px;
+    }
+    .product-image {
+        max-width: 80px;
+        max-height: 80px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+    .product-image:hover {
+        transform: scale(1.1);
     }
     tr:nth-child(even) {
         background-color: #f8f9fa;

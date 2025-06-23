@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 
 /**
  * DAO para manejar operaciones del carrito de compras
@@ -29,6 +30,30 @@ public class DCarrito {
             System.out.println("🗄️ DCarrito: Conexión establecida con autocommit habilitado");
         } catch (SQLException e) {
             System.err.println("Error conectando a la base de datos en DCarrito: " + e.getMessage());
+        }
+    }
+    
+    private DCarrito(Connection customConnection) {
+        this.connection = customConnection;
+        try {
+            this.connection.setAutoCommit(true);
+            System.out.println("🗄️ DCarrito: Conexión global establecida con autocommit habilitado");
+        } catch (SQLException e) {
+            System.err.println("Error configurando conexión en DCarrito: " + e.getMessage());
+        }
+    }
+    
+    public static DCarrito createWithGlobalConfig() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                DBConnectionManager.getUrl(), 
+                DBConnectionManager.getUser(), 
+                DBConnectionManager.getPassword()
+            );
+            return new DCarrito(conn);
+        } catch (SQLException e) {
+            System.err.println("Error creando DCarrito con configuración global: " + e.getMessage());
+            return new DCarrito(); // Fallback a local
         }
     }
 

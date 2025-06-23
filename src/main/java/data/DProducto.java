@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DProducto {
@@ -18,6 +19,16 @@ public class DProducto {
 
     public DProducto() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    // Constructor privado para uso con configuración global
+    private DProducto(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    // Constructor que usa configuración global del manager
+    public static DProducto createWithGlobalConfig() {
+        return new DProducto(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

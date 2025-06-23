@@ -89,6 +89,22 @@ public class HtmlRes {
                 padding: 12px;
                 border-bottom: 1px solid #ecf0f1;
                 font-size: 14px;
+                vertical-align: middle;
+            }
+            .image-cell {
+                text-align: center;
+                padding: 8px;
+            }
+            .product-image {
+                max-width: 80px;
+                max-height: 80px;
+                border-radius: 6px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                object-fit: cover;
+                transition: transform 0.2s ease;
+            }
+            .product-image:hover {
+                transform: scale(1.1);
             }
             tr:nth-child(even) {
                 background-color: #f8f9fa;
@@ -382,7 +398,61 @@ public class HtmlRes {
             return "<span class=\"badge badge-warning\">⏳ DESARROLLO</span>";
         }
         
+        // Detectar y formatear URLs de imágenes
+        if (isImageUrl(content)) {
+            return formatImageUrl(content);
+        }
+        
+        // Detectar y formatear URLs normales
+        if (isUrl(content)) {
+            return "<a href=\"" + content + "\" target=\"_blank\" style=\"color: #3498db; text-decoration: none;\">" + 
+                   truncateUrl(content) + "</a>";
+        }
+        
         return content;
+    }
+    
+    /**
+     * Verifica si el contenido es una URL de imagen
+     */
+    private static boolean isImageUrl(String content) {
+        if (content == null || content.trim().isEmpty()) return false;
+        
+        String lower = content.toLowerCase().trim();
+        return (lower.startsWith("http://") || lower.startsWith("https://")) &&
+               (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || 
+                lower.endsWith(".gif") || lower.endsWith(".webp") || lower.endsWith(".svg") ||
+                lower.contains("image") || lower.contains("img") || lower.contains("photo"));
+    }
+    
+    /**
+     * Verifica si el contenido es una URL
+     */
+    private static boolean isUrl(String content) {
+        if (content == null || content.trim().isEmpty()) return false;
+        
+        String lower = content.toLowerCase().trim();
+        return lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("www.");
+    }
+    
+    /**
+     * Formatea una URL de imagen como elemento <img>
+     */
+    private static String formatImageUrl(String imageUrl) {
+        String truncatedUrl = truncateUrl(imageUrl);
+        return "<div class=\"image-cell\">" +
+               "<img src=\"" + imageUrl + "\" alt=\"Imagen del producto\" class=\"product-image\"/>" +
+               "<br><small style=\"color: #7f8c8d; font-size: 10px; margin-top: 4px; display: block;\">" + 
+               truncatedUrl + "</small>" +
+               "</div>";
+    }
+    
+    /**
+     * Trunca URLs largas para mostrar mejor
+     */
+    private static String truncateUrl(String url) {
+        if (url == null || url.length() <= 30) return url;
+        return url.substring(0, 15) + "..." + url.substring(url.length() - 12);
     }
 
     /**

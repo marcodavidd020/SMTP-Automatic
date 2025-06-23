@@ -18,6 +18,7 @@ import javax.mail.search.FlagTerm;
 import javax.mail.search.ReceivedDateTerm;
 
 import com.mycompany.parcial1.tecnoweb.EmailAppIndependiente;
+import postgresConecction.DBConnectionManager;
 
 /**
  * Monitor que revisa emails recientes y procesa comandos usando
@@ -42,7 +43,14 @@ public class GmailMonitorComandos {
 
     public GmailMonitorComandos() {
         this.responder = new GmailRelay();
-        this.emailApp = new EmailAppIndependiente();
+        
+        // Usar la configuración global establecida previamente
+        boolean useTecnoweb = DBConnectionManager.getActiveConfig() == DBConnectionManager.ConfigType.TECNOWEB;
+        this.emailApp = new EmailAppIndependiente(useTecnoweb);
+        
+        System.out.println("📧 GmailMonitorComandos: Usando configuración " + 
+            (useTecnoweb ? "TECNOWEB" : "LOCAL"));
+        
         setupIMAPConnection();
     }
 

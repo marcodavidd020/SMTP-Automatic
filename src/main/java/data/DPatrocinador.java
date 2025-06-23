@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DPatrocinador {
@@ -18,6 +19,14 @@ public class DPatrocinador {
 
     public DPatrocinador() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DPatrocinador(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DPatrocinador createWithGlobalConfig() {
+        return new DPatrocinador(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

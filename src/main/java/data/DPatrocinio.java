@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DPatrocinio {
@@ -17,6 +18,14 @@ public class DPatrocinio {
 
     public DPatrocinio() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DPatrocinio(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DPatrocinio createWithGlobalConfig() {
+        return new DPatrocinio(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

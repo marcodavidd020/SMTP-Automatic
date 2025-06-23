@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DTipoPago {
@@ -18,6 +19,14 @@ public class DTipoPago {
 
     public DTipoPago() {
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DTipoPago(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DTipoPago createWithGlobalConfig() {
+        return new DTipoPago(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

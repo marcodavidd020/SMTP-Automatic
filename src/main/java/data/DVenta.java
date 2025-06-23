@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 
 /**
  * DAO para manejar operaciones de ventas y checkout
@@ -25,6 +26,24 @@ public class DVenta {
             this.connection = DriverManager.getConnection(DBConnection.url, DBConnection.user, DBConnection.password);
         } catch (SQLException e) {
             System.err.println("Error conectando a la base de datos en DVenta: " + e.getMessage());
+        }
+    }
+    
+    private DVenta(Connection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DVenta createWithGlobalConfig() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                DBConnectionManager.getUrl(), 
+                DBConnectionManager.getUser(), 
+                DBConnectionManager.getPassword()
+            );
+            return new DVenta(conn);
+        } catch (SQLException e) {
+            System.err.println("Error creando DVenta con configuración global: " + e.getMessage());
+            return new DVenta(); // Fallback a local
         }
     }
     

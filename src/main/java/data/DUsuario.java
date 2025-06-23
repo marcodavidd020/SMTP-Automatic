@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DUsuario {
@@ -24,6 +25,17 @@ public class DUsuario {
     // Constructor con configuración personalizada (NUEVO para Tecnoweb)
     public DUsuario(String database, String server, String port, String user, String password) {
         this.connection = new SqlConnection(database, server, port, user, password);
+    }
+    
+    // Constructor que usa configuración global del manager (NUEVO)
+    public static DUsuario createWithGlobalConfig() {
+        return new DUsuario(
+            DBConnectionManager.getDatabase(),
+            DBConnectionManager.getServer(), 
+            DBConnectionManager.getPort(),
+            DBConnectionManager.getUser(),
+            DBConnectionManager.getPassword()
+        );
     }
 
     public List<String[]> get(int id) throws SQLException {

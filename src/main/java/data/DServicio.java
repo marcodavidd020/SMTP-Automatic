@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
 
 public class DServicio {
@@ -18,6 +19,14 @@ public class DServicio {
     public DServicio() {
         // this.connection = new SqlConnection("grupo19sa", "mail.tecnoweb.org.bo", "5432", "grup019grup019", "db_grupo19sa");
         this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+    }
+    
+    private DServicio(SqlConnection customConnection) {
+        this.connection = customConnection;
+    }
+    
+    public static DServicio createWithGlobalConfig() {
+        return new DServicio(DBConnectionManager.createConnection());
     }
 
     public List<String[]> get(int id) throws SQLException {

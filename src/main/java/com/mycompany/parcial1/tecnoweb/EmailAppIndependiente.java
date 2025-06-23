@@ -18,6 +18,7 @@ import librerias.ParamsAction;
 import librerias.analex.Token;
 import negocio.NUsuario;
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.TestConnection;
 import servidor.GmailRelay;
 
@@ -38,6 +39,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
 
     private GmailRelay emailRelay;
     private NUsuario nUsuario;
+    private DUsuario dUsuario;
     private DProducto dProducto;
     private DCategoria dCategoria;
     private DCliente dCliente;
@@ -46,26 +48,63 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private DVenta dVenta;
 
     public EmailAppIndependiente() {
+        this(false); // Por defecto usar configuración local
+    }
+    
+    public EmailAppIndependiente(boolean useTecnoweb) {
+        // Configurar base de datos según parámetro
+        if (useTecnoweb) {
+            DBConnectionManager.setActiveConfig(DBConnectionManager.ConfigType.TECNOWEB);
+        } else {
+            DBConnectionManager.setActiveConfig(DBConnectionManager.ConfigType.LOCAL);
+        }
+
         this.emailRelay = new GmailRelay();
-        this.nUsuario = new NUsuario();
-        this.dProducto = new DProducto();
-        this.dCategoria = new DCategoria();
-        this.dCliente = new DCliente();
-        this.dTipoPago = new DTipoPago();
-        this.dCarrito = new DCarrito();
-        this.dVenta = new DVenta();
+        this.nUsuario = new NUsuario(useTecnoweb);  // ✅ USAR CONFIGURACIÓN GLOBAL
+        
+        // Usar configuración global para las clases de datos
+        if (useTecnoweb) {
+            this.dUsuario = DUsuario.createWithGlobalConfig();
+            this.dProducto = DProducto.createWithGlobalConfig();
+            this.dCategoria = DCategoria.createWithGlobalConfig();
+            this.dCliente = DCliente.createWithGlobalConfig();
+            this.dTipoPago = DTipoPago.createWithGlobalConfig();
+            this.dCarrito = DCarrito.createWithGlobalConfig();
+            this.dVenta = DVenta.createWithGlobalConfig();
+            
+            System.out.println("✅ TODAS las clases principales configuradas para usar BD TECNOWEB");
+        } else {
+            this.dUsuario = new DUsuario();
+            this.dProducto = new DProducto();
+            this.dCategoria = new DCategoria();
+            this.dCliente = new DCliente();
+            this.dTipoPago = new DTipoPago();
+            this.dCarrito = new DCarrito();
+            this.dVenta = new DVenta();
+            
+            System.out.println("✅ TODAS las clases principales configuradas para usar BD LOCAL");
+        }
 
         System.out.println("🚀 EmailApp Independiente inicializado");
         System.out.println("📧 Modo: Servidor Independiente con Gmail");
-        System.out.println("🗄️ Base de datos: " + DBConnection.database + " en " + DBConnection.server);
+        System.out.println("🗄️ Base de datos: " + DBConnectionManager.getDatabase() + " en " + DBConnectionManager.getServer());
 
         // Verificar conexión a base de datos
-        if (!TestConnection.testConnection()) {
+        if (!testGlobalConnection()) {
             System.err.println("⚠️ ADVERTENCIA: No se pudo conectar a la base de datos");
-            System.err.println("💡 Verifica que PostgreSQL esté ejecutándose");
-            System.err.println("💡 Verifica que la base de datos 'EcommerceTool' exista");
+            System.err.println("💡 Verifica la configuración de conexión");
+            DBConnectionManager.printCurrentConfig();
         } else {
             System.out.println("✅ Conexión a base de datos verificada");
+        }
+    }
+    
+    private boolean testGlobalConnection() {
+        try {
+            return DBConnectionManager.createConnection().connect() != null;
+        } catch (Exception e) {
+            System.err.println("❌ Error conectando: " + e.getMessage());
+            return false;
         }
     }
 
@@ -103,11 +142,14 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 System.out.println("   💬 Responderá como REPLY al email original");
             }
 
-            // Verificar conexión antes de procesar
-            if (!TestConnection.testConnection()) {
-                System.err.println("   ❌ Error de conexión a base de datos");
+            // Verificar conexión antes de procesar usando configuración global
+            if (!testGlobalConnection()) {
+                System.err.println("   ❌ Error de conexión a base de datos " + 
+                    (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL"));
                 sendErrorEmailAsReply(senderEmail,
-                        "Error de conexión a la base de datos. Verifica que PostgreSQL esté ejecutándose.",
+                        "Error de conexión a la base de datos " + 
+                        (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
+                        ". Verifica la configuración de conexión.",
                         originalSubject, messageId);
                 return;
             }
@@ -191,14 +233,20 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     }
 
     /**
-     * Verifica si el usuario está registrado en el sistema
+     * Verifica si el usuario está registrado en el sistema usando configuración global
      */
     private boolean isUserRegistered(String email) {
         try {
-            DUsuario dUser = new DUsuario();
-            return dUser.existsByEmail(email);
+            // ✅ USAR LA INSTANCIA GLOBAL QUE YA TIENE LA CONFIGURACIÓN CORRECTA
+            boolean registered = this.dUsuario.existsByEmail(email);
+            System.out.println("🔍 Verificación de usuario en BD " + 
+                (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
+                ": " + email + " -> " + (registered ? "REGISTRADO" : "NO REGISTRADO"));
+            return registered;
         } catch (Exception e) {
-            System.err.println("❌ Error verificando usuario: " + e.getMessage());
+            System.err.println("❌ Error verificando usuario en BD " + 
+                (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
+                ": " + e.getMessage());
             return false;
         }
     }
@@ -230,9 +278,11 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             String telefono = parts[3];
             String genero = parts[4];
 
-            // Registrar usuario
-            DUsuario dUser = new DUsuario();
-            List<String[]> userData = dUser.register(nombre, apellido, telefono, genero, senderEmail);
+            // ✅ REGISTRAR USUARIO USANDO CONFIGURACIÓN GLOBAL
+            List<String[]> userData = this.dUsuario.register(nombre, apellido, telefono, genero, senderEmail);
+            System.out.println("✅ Usuario registrado en BD " + 
+                (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
+                ": " + senderEmail);
 
             String html = HtmlRes.generateSuccess("Registro Exitoso",
                     "¡Bienvenido " + nombre + "! Tu cuenta ha sido creada exitosamente. " +

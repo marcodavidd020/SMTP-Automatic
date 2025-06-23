@@ -3,6 +3,7 @@ package com.mycompany.parcial1.tecnoweb;
 import java.util.Scanner;
 
 import postgresConecction.DBConnection;
+import postgresConecction.DBConnectionManager;
 import servidor.GmailMonitorComandos;
 import servidor.HTTPEmailServer;
 
@@ -24,7 +25,7 @@ public class LanzadorPrincipal {
         mostrarMenu();
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Selecciona una opción (1-6): ");
+        System.out.print("Selecciona una opción (1-7): ");
 
         try {
             int opcion = scanner.nextInt();
@@ -44,14 +45,15 @@ public class LanzadorPrincipal {
         System.out.println("1. 📧 EmailApp Tecnoweb - Versión original POP3");
         System.out.println();
         System.out.println("🛒 SISTEMA DE E-COMMERCE:");
-        System.out.println("2. 🤖 Monitor Gmail con E-commerce - Sistema completo de carrito y ventas");
-        System.out.println("3. 🌐 Servidor HTTP Email - Interfaz web + API REST");
-        System.out.println("4. 🔄 Sistema Completo - Monitor Gmail + Servidor HTTP");
+        System.out.println("2. 🤖 Monitor Gmail con E-commerce (Local) - Sistema completo de carrito y ventas");
+        System.out.println("3. 🤖 Monitor Gmail con E-commerce (Tecnoweb) - Usar BD remota de Tecnoweb");
+        System.out.println("4. 🌐 Servidor HTTP Email - Interfaz web + API REST");
+        System.out.println("5. 🔄 Sistema Completo - Monitor Gmail + Servidor HTTP");
         
         System.out.println();
         System.out.println("🛠️ HERRAMIENTAS:");
-        System.out.println("5. 📊 Test EmailApp E-commerce - Prueba sistema de carrito");
-        System.out.println("6. ❓ Mostrar información del sistema");
+        System.out.println("6. 📊 Test EmailApp E-commerce - Prueba sistema de carrito");
+        System.out.println("7. ❓ Mostrar información del sistema");
         System.out.println();
     }
 
@@ -61,18 +63,21 @@ public class LanzadorPrincipal {
                 ejecutarEmailAppTecnoweb();
                 break;
             case 2:
-                ejecutarMonitorGmailComandos();
+                ejecutarMonitorGmailComandosLocal();
                 break;
             case 3:
-                ejecutarServidorHTTP();
+                ejecutarMonitorGmailComandosTecnoweb();
                 break;
             case 4:
-                ejecutarSistemaCompleto();
+                ejecutarServidorHTTP();
                 break;
             case 5:
-                ejecutarTestEmailApp();
+                ejecutarSistemaCompleto();
                 break;
             case 6:
+                ejecutarTestEmailApp();
+                break;
+            case 7:
                 mostrarInformacionSistema();
                 break;
             default:
@@ -105,8 +110,8 @@ public class LanzadorPrincipal {
         }
     }
     
-    private static void ejecutarMonitorGmailComandos() {
-        System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce...");
+    private static void ejecutarMonitorGmailComandosLocal() {
+        System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce (LOCAL)...");
         System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
         System.out.println("🗄️ Base de datos: " + DBConnection.database + " en " + DBConnection.server);
         System.out.println("🛒 Sistema completo de carrito, checkout y pagos");
@@ -119,6 +124,32 @@ public class LanzadorPrincipal {
         System.out.println("   ❓ AYUDA: 'help'");
         System.out.println();
 
+        // Configurar para usar base de datos local
+        DBConnectionManager.setActiveConfig(DBConnectionManager.ConfigType.LOCAL);
+        
+        GmailMonitorComandos monitor = new GmailMonitorComandos();
+        monitor.startMonitoring();
+    }
+    
+    private static void ejecutarMonitorGmailComandosTecnoweb() {
+        System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce (TECNOWEB)...");
+        System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
+        System.out.println("🗄️ Base de datos: " + DBConnection.TecnoWeb.database + " en " + DBConnection.TecnoWeb.server);
+        System.out.println("🛒 Sistema E-commerce conectado a Tecnoweb");
+        System.out.println();
+        System.out.println("📝 COMANDOS DE E-COMMERCE DISPONIBLES:");
+        System.out.println("   🔐 REGISTRO: 'registrar Juan Pérez 123456789 masculino'");
+        System.out.println("   📋 CONSULTAS: 'productos get', 'categorias get', 'tipos_pago get'");
+        System.out.println("   🛒 CARRITO: 'carrito add 161 3', 'carrito get', 'carrito clear'");
+        System.out.println("   💳 COMPRAS: 'checkout', 'pago 123 1', 'ventas get'");
+        System.out.println("   ❓ AYUDA: 'help'");
+        System.out.println();
+        System.out.println("⚠️ NOTA: Usando base de datos remota de mail.tecnoweb.org.bo");
+        System.out.println();
+
+        // Configurar para usar base de datos de Tecnoweb
+        DBConnectionManager.setActiveConfig(DBConnectionManager.ConfigType.TECNOWEB);
+        
         GmailMonitorComandos monitor = new GmailMonitorComandos();
         monitor.startMonitoring();
     }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import data.DUsuario;
+import postgresConecction.DBConnectionManager;
 
 public class NUsuario {
 
@@ -12,6 +13,16 @@ public class NUsuario {
 
     public NUsuario() {
         this.dUsuario = new DUsuario();
+    }
+    
+    public NUsuario(boolean useGlobalConfig) {
+        if (useGlobalConfig) {
+            this.dUsuario = DUsuario.createWithGlobalConfig();
+            System.out.println("📝 NUsuario: Usando configuración " + 
+                (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL"));
+        } else {
+            this.dUsuario = new DUsuario();
+        }
     }
 
     public ArrayList<String[]> list() throws SQLException {
