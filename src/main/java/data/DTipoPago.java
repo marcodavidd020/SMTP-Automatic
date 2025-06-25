@@ -31,7 +31,7 @@ public class DTipoPago {
 
     public List<String[]> get(int id) throws SQLException {
         List<String[]> tipoPago = new ArrayList<>();
-        String query = "SELECT * FROM tipos_pago WHERE id = ?";
+        String query = "SELECT * FROM \"tipo_pago\" WHERE \"id\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -54,7 +54,7 @@ public class DTipoPago {
 
     public List<String[]> list() throws SQLException {
         List<String[]> tiposPago = new ArrayList<>();
-        String query = "SELECT * FROM tipos_pago ORDER BY tipo_pago";
+        String query = "SELECT * FROM \"tipo_pago\" ORDER BY \"tipo_pago\"";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ResultSet set = ps.executeQuery();

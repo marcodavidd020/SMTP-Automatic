@@ -17,6 +17,8 @@ import librerias.HtmlRes;
 import librerias.ParamsAction;
 import librerias.analex.Token;
 import negocio.NUsuario;
+import negocio.NCarrito;
+import negocio.NCategoria;
 import postgresConecction.DBConnection;
 import postgresConecction.DBConnectionManager;
 import postgresConecction.TestConnection;
@@ -41,10 +43,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private NUsuario nUsuario;
     private DUsuario dUsuario;
     private DProducto dProducto;
-    private DCategoria dCategoria;
+    private NCategoria nCategoria;
     private DCliente dCliente;
     private DTipoPago dTipoPago;
-    private DCarrito dCarrito;
+    private NCarrito nCarrito;
     private DVenta dVenta;
 
     public EmailAppIndependiente() {
@@ -66,20 +68,20 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         if (useTecnoweb) {
             this.dUsuario = DUsuario.createWithGlobalConfig();
             this.dProducto = DProducto.createWithGlobalConfig();
-            this.dCategoria = DCategoria.createWithGlobalConfig();
+            this.nCategoria = new NCategoria();  // Usa configuración global internamente
             this.dCliente = DCliente.createWithGlobalConfig();
             this.dTipoPago = DTipoPago.createWithGlobalConfig();
-            this.dCarrito = DCarrito.createWithGlobalConfig();
+            this.nCarrito = new NCarrito();      // Usa configuración global internamente
             this.dVenta = DVenta.createWithGlobalConfig();
             
             System.out.println("✅ TODAS las clases principales configuradas para usar BD TECNOWEB");
         } else {
             this.dUsuario = new DUsuario();
             this.dProducto = new DProducto();
-            this.dCategoria = new DCategoria();
+            this.nCategoria = new NCategoria();  // Usa configuración local por defecto
             this.dCliente = new DCliente();
             this.dTipoPago = new DTipoPago();
-            this.dCarrito = new DCarrito();
+            this.nCarrito = new NCarrito();      // Usa configuración local por defecto
             this.dVenta = new DVenta();
             
             System.out.println("✅ TODAS las clases principales configuradas para usar BD LOCAL");
@@ -556,7 +558,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 if (param != null) {
                     try {
                         int id = Integer.parseInt(param);
-                        List<String[]> categoriaData = dCategoria.get(id);
+                        List<String[]> categoriaData = nCategoria.get(id);
                         sendTableResponse(senderEmail, "Categoría encontrada",
                                 DCategoria.HEADERS, (ArrayList<String[]>) categoriaData, comando, originalSubject,
                                 messageId);
@@ -564,7 +566,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         sendSimpleResponse(senderEmail, "Error", "ID inválido: " + param, originalSubject, messageId);
                     }
                 } else {
-                    List<String[]> categorias = dCategoria.list();
+                    List<String[]> categorias = nCategoria.list();
                     sendTableResponse(senderEmail, "Lista de Categorías",
                             DCategoria.HEADERS, (ArrayList<String[]>) categorias, comando, originalSubject, messageId);
                 }
@@ -788,7 +790,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         String idParam = event.getParams().get(0);
                         try {
                             int id = Integer.parseInt(idParam);
-                            List<String[]> categoriaData = dCategoria.get(id);
+                            List<String[]> categoriaData = nCategoria.get(id);
                             sendTableResponse(event.getSender(), "Categoría encontrada",
                                     DCategoria.HEADERS, (ArrayList<String[]>) categoriaData, event.getCommand(), null,
                                     null);
@@ -796,7 +798,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                             sendSimpleResponse(event.getSender(), "Error", "ID de categoría inválido.", null, null);
                         }
                     } else {
-                        List<String[]> categorias = dCategoria.list();
+                        List<String[]> categorias = nCategoria.list();
                         sendTableResponse(event.getSender(), "Lista de Categorías",
                                 DCategoria.HEADERS, (ArrayList<String[]>) categorias, event.getCommand(), null, null);
                     }
@@ -913,7 +915,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     // categoria get <id>
                     try {
                         int id = Integer.parseInt(event.getParams(0));
-                        List<String[]> categoria = dCategoria.get(id);
+                        List<String[]> categoria = nCategoria.get(id);
                         sendTableResponse(event.getSender(), "📂 Información de Categoría", 
                                         DCategoria.HEADERS, new ArrayList<>(categoria), 
                                         event.getCommand(), null, null);
@@ -922,7 +924,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     }
                 } else {
                     // categoria get (listar todas)
-                    List<String[]> categorias = dCategoria.list();
+                    List<String[]> categorias = nCategoria.list();
                     sendTableResponse(event.getSender(), "📂 Lista de Categorías", 
                                     DCategoria.HEADERS, new ArrayList<>(categorias), 
                                     event.getCommand(), null, null);
@@ -1126,7 +1128,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                                 int productoId = Integer.parseInt(params[2]);
                                 int cantidad = Integer.parseInt(params[3]);
 
-                                if (dCarrito.agregarProducto(clienteId, productoId, cantidad)) {
+                                if (nCarrito.agregarProducto(clienteId, productoId, cantidad)) {
                                     sendSimpleResponse(senderEmail, "✅ Producto Agregado",
                                             String.format(
                                                     "Producto #%d agregado al carrito exitosamente (cantidad: %d).\n\n"
@@ -1181,13 +1183,13 @@ public class EmailAppIndependiente implements ICasoUsoListener {
 
                 case "get":
                     // Mostrar contenido del carrito
-                    List<String[]> carrito = dCarrito.obtenerCarrito(clienteId);
+                    List<String[]> carrito = nCarrito.obtenerCarrito(clienteId);
                     if (carrito.isEmpty()) {
                         sendSimpleResponse(senderEmail, "🛒 Carrito Vacío",
                                 "Tu carrito está vacío. Usa 'carrito add [producto_id] [cantidad]' para agregar productos.",
                                 originalSubject, messageId);
                     } else {
-                        double total = dCarrito.obtenerTotalCarrito(clienteId);
+                        double total = nCarrito.obtenerTotalCarrito(clienteId);
                         String titulo = String.format("🛒 Tu Carrito - Total: $%.2f", total);
                         sendTableResponse(senderEmail, titulo, DCarrito.DETALLE_HEADERS,
                                 (ArrayList<String[]>) carrito, comando, originalSubject, messageId);
@@ -1198,7 +1200,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     if (param != null) {
                         try {
                             int productoId = Integer.parseInt(param);
-                            if (dCarrito.removerProducto(clienteId, productoId)) {
+                            if (nCarrito.removerProducto(clienteId, productoId)) {
                                 sendSimpleResponse(senderEmail, "✅ Producto Removido",
                                         "Producto removido del carrito exitosamente.", originalSubject, messageId);
                             } else {
@@ -1216,7 +1218,7 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     break;
 
                 case "clear":
-                    if (dCarrito.vaciarCarrito(clienteId)) {
+                    if (nCarrito.vaciarCarrito(clienteId)) {
                         sendSimpleResponse(senderEmail, "✅ Carrito Vaciado",
                                 "Tu carrito ha sido vaciado exitosamente.", originalSubject, messageId);
                     } else {
