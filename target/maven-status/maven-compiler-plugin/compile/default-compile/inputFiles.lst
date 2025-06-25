@@ -23,6 +23,7 @@
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/Instruccion.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/Interpreter.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/ParamsAction.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/PasswordHelper.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Analex.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Cinta.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/TSParams.java
@@ -72,6 +73,7 @@
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestFixUser.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestHtmlMejorado.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestRealStructure.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestRegistroConRol2.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestSimpleAuth.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestSistemaCompleto.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestTecnowebAuth.java

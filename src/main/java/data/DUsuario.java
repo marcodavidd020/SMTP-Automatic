@@ -10,6 +10,7 @@ import java.util.List;
 import postgresConecction.DBConnection;
 import postgresConecction.DBConnectionManager;
 import postgresConecction.SqlConnection;
+import librerias.PasswordHelper;
 
 public class DUsuario {
 
@@ -77,7 +78,7 @@ public class DUsuario {
             ps.setString(2, telefono);                // Laravel usa 'celular' 
             ps.setString(3, email);
             ps.setString(4, genero);                  // Laravel: enum('masculino', 'femenino', 'otro')
-            ps.setString(5, password);
+            ps.setString(5, PasswordHelper.hashPassword(password));  // 🔒 ENCRIPTAR CONTRASEÑA
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -205,7 +206,7 @@ public class DUsuario {
         }
 
         String fullName = nombre + " " + apellido;
-        String defaultPassword = "temp123"; // Contraseña temporal
+        String defaultPassword = PasswordHelper.generateTemporaryPassword(); // Contraseña temporal segura
 
         Connection conn = null;
         try {
@@ -220,7 +221,7 @@ public class DUsuario {
                 ps.setString(2, telefono);    // Laravel usa 'celular'
                 ps.setString(3, email);
                 ps.setString(4, genero);      // Laravel: enum('masculino', 'femenino', 'otro')
-                ps.setString(5, defaultPassword);
+                ps.setString(5, PasswordHelper.hashPassword(defaultPassword));  // 🔒 ENCRIPTAR CONTRASEÑA
 
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -263,7 +264,16 @@ public class DUsuario {
             }
 
             conn.commit(); // Confirmar transacción
-            return get(userId);
+            
+            // Retornar información del usuario con contraseña temporal
+            List<String[]> resultado = new ArrayList<>();
+            resultado.add(new String[]{
+                String.valueOf(userId),
+                fullName,
+                email,
+                "CONTRASEÑA_TEMPORAL: " + defaultPassword // Mostrar contraseña temporal
+            });
+            return resultado;
 
         } catch (SQLException e) {
             if (conn != null) {

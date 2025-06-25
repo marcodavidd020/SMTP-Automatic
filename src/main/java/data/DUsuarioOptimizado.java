@@ -9,6 +9,7 @@ import java.util.List;
 
 import postgresConecction.DBConnection;
 import postgresConecction.SqlConnection;
+import librerias.PasswordHelper;
 
 /**
  * Versión optimizada de DUsuario para tecnoweb con manejo eficiente de conexiones
@@ -90,7 +91,7 @@ public class DUsuarioOptimizado {
         }
 
         String fullName = nombre + " " + apellido;
-        String defaultPassword = "tecnoweb123"; // Contraseña por defecto
+        String defaultPassword = PasswordHelper.generateTemporaryPassword(); // Contraseña segura
         SqlConnection connection = getSharedConnection();
 
         Connection conn = null;
@@ -107,7 +108,7 @@ public class DUsuarioOptimizado {
                 ps.setString(2, telefono);
                 ps.setString(3, email);
                 ps.setString(4, genero);
-                ps.setString(5, defaultPassword);
+                ps.setString(5, PasswordHelper.hashPassword(defaultPassword));  // 🔒 ENCRIPTAR CONTRASEÑA
 
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -155,13 +156,13 @@ public class DUsuarioOptimizado {
 
             conn.commit(); // Confirmar transacción
             
-            // ✅ 4. RETORNAR DATOS DEL USUARIO REGISTRADO
+            // ✅ 4. RETORNAR DATOS DEL USUARIO REGISTRADO (incluyendo contraseña temporal)
             List<String[]> resultado = new ArrayList<>();
             resultado.add(new String[]{
                 String.valueOf(userId),
                 fullName,
                 email,
-                "REGISTRADO"
+                "CONTRASEÑA_TEMPORAL: " + defaultPassword // Mostrar contraseña temporal al usuario
             });
             
             return resultado;
