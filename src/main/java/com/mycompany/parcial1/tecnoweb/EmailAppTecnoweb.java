@@ -2,7 +2,10 @@ package com.mycompany.parcial1.tecnoweb;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import data.DCategoria;
@@ -15,6 +18,7 @@ import librerias.Email;
 import librerias.HtmlRes;
 import librerias.ParamsAction;
 import negocio.NUsuario;
+import postgresConecction.DBConnectionManager;
 import postgresConecction.DBConnection;
 import postgresConecction.EmailSend;
 import servidor.GmailRelay;
@@ -282,6 +286,8 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
 
         if (comando.equals("help")) {
             processHelpCommand(senderEmail);
+        } else if (comando.startsWith("registrar")) {
+            processRegistrarCommand(senderEmail, comando);
         } else if (comando.startsWith("usuario") || comando.startsWith("usuarios")) {
             processUsuarioCommand(senderEmail, comando);
         } else if (comando.startsWith("producto") || comando.startsWith("productos")) {
@@ -334,6 +340,140 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
                 "<p>⚠️ Función no implementada aún - requiere conexión a tecnoweb</p>";
 
         sendEmailViaTecnoweb(senderEmail, "Categorías - EmailApp Tecnoweb", message);
+    }
+
+    /**
+     * ✅ IMPLEMENTACIÓN DEL COMANDO REGISTRAR
+     * Formato: registrar [Nombre] [Apellido] [Teléfono] [Género]
+     * Ejemplo: registrar Marco Toledo 67733399 masculino
+     * 
+     * Sigue arquitectura de 3 capas y compatibilidad con User.php
+     */
+    private void processRegistrarCommand(String senderEmail, String comando) {
+        System.out.println("👤 Procesando comando REGISTRAR (Tecnoweb):");
+        System.out.println("   📧 Email: " + senderEmail);
+        System.out.println("   📝 Comando: " + comando);
+
+        try {
+            // Parsear comando: "registrar Marco Toledo 67733399 masculino"
+            String[] parts = comando.trim().split("\\s+");
+            
+            if (parts.length != 5) {
+                sendErrorEmail(senderEmail, 
+                    "Formato incorrecto. Use: registrar [Nombre] [Apellido] [Teléfono] [Género]\n" +
+                    "Ejemplo: registrar Marco Toledo 67733399 masculino");
+                return;
+            }
+
+            String nombre = parts[1];
+            String apellido = parts[2]; 
+            String telefono = parts[3];
+            String genero = parts[4];
+
+            // Validar género
+            if (!genero.equalsIgnoreCase("masculino") && !genero.equalsIgnoreCase("femenino")) {
+                sendErrorEmail(senderEmail, 
+                    "Género inválido. Use: masculino o femenino");
+                return;
+            }
+
+                         // ✅ ARQUITECTURA 3 CAPAS: USAR CAPA DE NEGOCIO
+             try {
+                 // Registrar usuario usando NUsuario (capa de negocio)
+                 List<String[]> resultado = registrarUsuarioConNegocio(
+                     nombre, apellido, telefono, genero, senderEmail);
+
+                if (!resultado.isEmpty()) {
+                    String[] user = resultado.get(0);
+                    
+                    // ✅ RESPUESTA CON HTML MODERNO
+                    String htmlContent = HtmlRes.generateSuccess(
+                        "✅ Registro Exitoso", 
+                        String.format("¡Bienvenido %s %s!\n\n" +
+                            "Tu cuenta ha sido creada exitosamente:\n\n" +
+                            "📧 Email: %s\n" +
+                            "📱 Teléfono: %s\n" +
+                            "👤 Género: %s\n" +
+                            "🆔 ID Usuario: %s\n\n" +
+                            "🌐 Servidor: %s\n" +
+                            "🗄️ Base de datos: %s\n\n" +
+                            "Ya puedes usar todos los comandos del sistema.",
+                            nombre, apellido, senderEmail, telefono, genero, 
+                            user[0], DBConnection.TecnoWeb.server, DBConnection.TecnoWeb.database));
+
+                    sendEmailViaTecnoweb(senderEmail, "✅ Registro Exitoso - Sistema Tecnoweb", htmlContent);
+                    System.out.println("✅ Usuario registrado exitosamente en Tecnoweb: " + senderEmail);
+                } else {
+                    sendErrorEmail(senderEmail, "Error: No se pudo completar el registro");
+                }
+
+            } catch (SQLException e) {
+                System.err.println("❌ Error SQL en registro: " + e.getMessage());
+                
+                if (e.getMessage().contains("already exists") || e.getMessage().contains("ya está registrado")) {
+                    sendErrorEmail(senderEmail, 
+                        "Este email ya está registrado en el sistema. " +
+                        "Si olvidaste tus datos, contacta al administrador.");
+                } else {
+                    sendErrorEmail(senderEmail, 
+                        "Error de base de datos: " + e.getMessage());
+                }
+                         } catch (Exception ex) {
+                 System.err.println("❌ Error en capa de negocio: " + ex.getMessage());
+                 throw ex;
+             }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error general en registro: " + e.getMessage());
+            sendErrorEmail(senderEmail, 
+                "Error procesando registro: " + e.getMessage() + 
+                "\n\nUse el formato: registrar [Nombre] [Apellido] [Teléfono] [Género]");
+        }
+    }
+
+    /**
+     * ✅ MÉTODO DE REGISTRO USANDO CAPA DE NEGOCIO
+     * Usa NUsuario.save() siguiendo arquitectura de 3 capas
+     */
+    private List<String[]> registrarUsuarioConNegocio(String nombre, String apellido, String telefono, 
+                                                      String genero, String email) throws SQLException {
+        
+        // ✅ USAR CAPA DE NEGOCIO - NUsuario
+        NUsuario nUsuario = new NUsuario();
+        
+        // Verificar si el email ya existe
+        try {
+            nUsuario.getByEmail(email);
+            throw new SQLException("El email ya está registrado: " + email);
+        } catch (SQLException e) {
+            // Si no encuentra el usuario, continuar con el registro
+            if (!e.getMessage().contains("no encontrado")) {
+                throw e; // Re-lanzar si es otro error
+            }
+        }
+        
+        // Preparar parámetros para NUsuario.save()
+        // save(nombre, apellido, telefono, genero, email, password, rol_id)
+        List<String> parametros = new ArrayList<>();
+        parametros.add(nombre);          // 0: nombre
+        parametros.add(apellido);        // 1: apellido  
+        parametros.add(telefono);        // 2: telefono
+        parametros.add(genero);          // 3: genero
+        parametros.add(email);           // 4: email
+        parametros.add("password");      // 5: password (temporal)
+        parametros.add("1");             // 6: rol_id (cliente por defecto)
+        
+        System.out.println("📝 Registrando usuario via NUsuario.save():");
+        System.out.println("   📧 Email: " + email);
+        System.out.println("   👤 Nombre: " + nombre + " " + apellido);
+        System.out.println("   📱 Teléfono: " + telefono);
+        System.out.println("   👫 Género: " + genero);
+        
+        // ✅ LLAMAR A LA CAPA DE NEGOCIO
+        List<String[]> resultado = nUsuario.save(parametros);
+        
+        System.out.println("✅ Usuario registrado exitosamente usando capa de negocio");
+        return resultado;
     }
 
     private void sendWelcomeEmail(String email) {
@@ -438,13 +578,18 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
         try {
             // ✅ GENERAR HTML MODERNO PARA AYUDA
             String helpHtml = HtmlRes.generateSuccess("Sistema de Comandos Tecnoweb", 
-                "Comandos disponibles:\n" +
-                "• usuario get - Ver información de usuarios\n" +
-                "• producto get [id] - Ver productos\n" +
-                "• categoria get [id] - Ver categorías\n" +
-                "• cliente get [id] - Ver clientes\n" +
-                "• tipo_pago get [id] - Ver tipos de pago\n\n" +
-                "📧 Sistema vía: mail.tecnoweb.org.bo");
+                "Comandos disponibles:\n\n" +
+                "🔐 REGISTRO:\n" +
+                "• registrar [Nombre] [Apellido] [Teléfono] [Género]\n" +
+                "  Ejemplo: registrar Marco Toledo 67733399 masculino\n\n" +
+                "📊 CONSULTAS:\n" +
+                "• get usuario - Ver información de usuarios\n" +
+                "• get producto [id] - Ver productos\n" +
+                "• get categoria [id] - Ver categorías\n" +
+                "• get cliente [id] - Ver clientes\n" +
+                "• get tipo_pago [id] - Ver tipos de pago\n\n" +
+                "📧 Sistema vía: mail.tecnoweb.org.bo\n" +
+                "🗄️ Base de datos: " + DBConnection.TecnoWeb.database);
                 
             sendEmailViaTecnoweb(event.getSender(), "Ayuda - Comandos Disponibles", helpHtml);
             System.out.println("🎨 Email de ayuda enviado con estilos HTML modernos (Tecnoweb)");
