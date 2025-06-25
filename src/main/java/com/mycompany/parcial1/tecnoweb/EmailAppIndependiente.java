@@ -364,7 +364,63 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         }
     }
 
+    /**
+     * ✅ NUEVO MÉTODO QUE USA EL ANALEX A TRAVÉS DEL INTERPRETER
+     */
     private void processDirectCommand(String senderEmail, String comando, String originalSubject, String messageId) {
+        try {
+            System.out.println("🔄 Procesando comando con ANALEX: " + comando);
+            
+            // Verificar si es un comando especial que no usa analex
+            String[] parts = comando.split("\\s+");
+            if (parts.length > 0) {
+                String entity = normalizeCommand(parts[0]);
+                
+                // Comandos especiales que mantienen su lógica original
+                switch (entity) {
+                    case "carrito":
+                        String action = parts.length > 1 ? parts[1] : "get";
+                        String param = parts.length > 2 ? parts[2] : null;
+                        processCarritoCommand(senderEmail, action, param, comando, originalSubject, messageId);
+                        return;
+                    case "checkout":
+                        processCheckoutCommand(senderEmail, comando, originalSubject, messageId);
+                        return;
+                    case "pago":
+                        String pagoAction = parts.length > 1 ? parts[1] : "get";
+                        String pagoParam = parts.length > 2 ? parts[2] : null;
+                        processPagoCommand(senderEmail, pagoAction, pagoParam, comando, originalSubject, messageId);
+                        return;
+                    case "ventas":
+                    case "compras":
+                        String ventasAction = parts.length > 1 ? parts[1] : "get";
+                        String ventasParam = parts.length > 2 ? parts[2] : null;
+                        processVentasCommand(senderEmail, ventasAction, ventasParam, comando, originalSubject, messageId);
+                        return;
+                }
+            }
+            
+            // ✅ USAR ANALEX PARA COMANDOS ESTÁNDAR
+            librerias.Interpreter interpreter = new librerias.Interpreter(comando, senderEmail);
+            interpreter.setCasoUsoListener(this);
+            
+            System.out.println("🤖 Ejecutando comando via ANALEX...");
+            interpreter.run();
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error en processDirectCommand con ANALEX: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Fallback: procesar de forma manual si analex falla
+            System.out.println("🔄 Fallback: procesando manualmente...");
+            processDirectCommandFallback(senderEmail, comando, originalSubject, messageId);
+        }
+    }
+    
+    /**
+     * ⚡ MÉTODO FALLBACK PARA COMANDOS QUE NO FUNCIONEN CON ANALEX
+     */
+    private void processDirectCommandFallback(String senderEmail, String comando, String originalSubject, String messageId) {
         try {
             String[] parts = comando.split("\\s+");
 
@@ -373,12 +429,11 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 return;
             }
 
-            String entity = normalizeCommand(parts[0]); // 🆕 NORMALIZAR COMANDO
+            String entity = normalizeCommand(parts[0]);
             String action = parts.length > 1 ? parts[1] : "get";
             String param = parts.length > 2 ? parts[2] : null;
 
-            System.out.println("   🎯 Entidad: " + entity + " (original: " + parts[0] + "), Acción: " + action
-                    + ", Parámetro: " + param);
+            System.out.println("   🎯 [FALLBACK] Entidad: " + entity + ", Acción: " + action + ", Parámetro: " + param);
 
             switch (entity) {
                 case "usuario":
@@ -396,31 +451,18 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 case "tipo_pago":
                     processTipoPagoCommand(senderEmail, action, param, comando, originalSubject, messageId);
                     break;
-                case "carrito":
-                    processCarritoCommand(senderEmail, action, param, comando, originalSubject, messageId);
-                    break;
-                case "checkout":
-                    processCheckoutCommand(senderEmail, comando, originalSubject, messageId);
-                    break;
-                case "pago":
-                    processPagoCommand(senderEmail, action, param, comando, originalSubject, messageId);
-                    break;
-                case "ventas":
-                case "compras":
-                    processVentasCommand(senderEmail, action, param, comando, originalSubject, messageId);
-                    break;
                 case "help":
                     processHelpCommand(senderEmail, comando, originalSubject, messageId);
                     break;
                 default:
                     sendErrorEmail(senderEmail,
                             "Comando no reconocido: " + parts[0]
-                                    + " (intenta: usuario, producto, categoria, cliente, tipo_pago, carrito, checkout, pago, ventas, help)",
+                                    + " (intenta: usuario, producto, categoria, cliente, tipo_pago, help)",
                             originalSubject, messageId);
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error en processDirectCommand: " + e.getMessage());
+            System.err.println("❌ Error en processDirectCommandFallback: " + e.getMessage());
             sendErrorEmail(senderEmail, "Error procesando comando: " + e.getMessage(), originalSubject, messageId);
         }
     }
@@ -645,8 +687,40 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     // Implementación de la interfaz ICasoUsoListener (métodos requeridos)
     @Override
     public void usuario(ParamsAction event) {
-        // Redirigir al procesamiento directo (sin reply para estos métodos legacy)
-        processUsuarioCommand(event.getSender(), "get", null, event.getCommand(), null, null);
+        System.out.println("👤 Procesando comando USUARIO via ANALEX:");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // usuario get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> userData = nUsuario.get(id);
+                        sendTableResponse(event.getSender(), "👤 Información de Usuario", 
+                                        DUsuario.HEADERS, new ArrayList<>(userData), 
+                                        event.getCommand(), null, null);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmailAsReply(event.getSender(), "ID de usuario inválido: " + event.getParams(0), null, null);
+                    }
+                } else {
+                    // usuario get (listar todos)
+                    List<String[]> usuarios = nUsuario.list();
+                    sendTableResponse(event.getSender(), "👤 Lista de Usuarios", 
+                                    DUsuario.HEADERS, new ArrayList<>(usuarios), 
+                                    event.getCommand(), null, null);
+                }
+            } else {
+                sendSimpleResponse(event.getSender(), "❌ Acción no soportada", 
+                                 "La acción '" + action + "' no está disponible para usuarios. Use 'usuario get'", null, null);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando usuario: " + e.getMessage());
+            sendErrorEmailAsReply(event.getSender(), "Error procesando comando: " + e.getMessage(), null, null);
+        }
     }
 
     @Override
@@ -752,6 +826,159 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         }
     }
 
+    // ✅ NUEVOS MÉTODOS IMPLEMENTADOS PARA ANALEX
+    @Override
+    public void producto(ParamsAction event) {
+        System.out.println("🛍️ Procesando comando PRODUCTO via ANALEX:");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // producto get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> producto = dProducto.get(id);
+                        sendTableResponse(event.getSender(), "🛍️ Información de Producto", 
+                                        DProducto.HEADERS, new ArrayList<>(producto), 
+                                        event.getCommand(), null, null);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmailAsReply(event.getSender(), "ID de producto inválido: " + event.getParams(0), null, null);
+                    }
+                } else {
+                    // producto get (listar todos)
+                    List<String[]> productos = dProducto.list();
+                    sendTableResponse(event.getSender(), "🛍️ Lista de Productos", 
+                                    DProducto.HEADERS, new ArrayList<>(productos), 
+                                    event.getCommand(), null, null);
+                }
+            } else {
+                sendSimpleResponse(event.getSender(), "❌ Acción no soportada", 
+                                 "La acción '" + action + "' no está disponible para productos. Use 'producto get'", null, null);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando producto: " + e.getMessage());
+            sendErrorEmailAsReply(event.getSender(), "Error procesando comando: " + e.getMessage(), null, null);
+        }
+    }
+
+    @Override
+    public void categoria(ParamsAction event) {
+        System.out.println("📂 Procesando comando CATEGORIA via ANALEX:");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // categoria get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> categoria = dCategoria.get(id);
+                        sendTableResponse(event.getSender(), "📂 Información de Categoría", 
+                                        DCategoria.HEADERS, new ArrayList<>(categoria), 
+                                        event.getCommand(), null, null);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmailAsReply(event.getSender(), "ID de categoría inválido: " + event.getParams(0), null, null);
+                    }
+                } else {
+                    // categoria get (listar todas)
+                    List<String[]> categorias = dCategoria.list();
+                    sendTableResponse(event.getSender(), "📂 Lista de Categorías", 
+                                    DCategoria.HEADERS, new ArrayList<>(categorias), 
+                                    event.getCommand(), null, null);
+                }
+            } else {
+                sendSimpleResponse(event.getSender(), "❌ Acción no soportada", 
+                                 "La acción '" + action + "' no está disponible para categorías. Use 'categoria get'", null, null);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando categoria: " + e.getMessage());
+            sendErrorEmailAsReply(event.getSender(), "Error procesando comando: " + e.getMessage(), null, null);
+        }
+    }
+
+    @Override
+    public void cliente(ParamsAction event) {
+        System.out.println("👤 Procesando comando CLIENTE via ANALEX:");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // cliente get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> cliente = dCliente.get(id);
+                        sendTableResponse(event.getSender(), "👤 Información de Cliente", 
+                                        DCliente.HEADERS, new ArrayList<>(cliente), 
+                                        event.getCommand(), null, null);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmailAsReply(event.getSender(), "ID de cliente inválido: " + event.getParams(0), null, null);
+                    }
+                } else {
+                    // cliente get (listar todos)
+                    List<String[]> clientes = dCliente.list();
+                    sendTableResponse(event.getSender(), "👤 Lista de Clientes", 
+                                    DCliente.HEADERS, new ArrayList<>(clientes), 
+                                    event.getCommand(), null, null);
+                }
+            } else {
+                sendSimpleResponse(event.getSender(), "❌ Acción no soportada", 
+                                 "La acción '" + action + "' no está disponible para clientes. Use 'cliente get'", null, null);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando cliente: " + e.getMessage());
+            sendErrorEmailAsReply(event.getSender(), "Error procesando comando: " + e.getMessage(), null, null);
+        }
+    }
+
+    @Override
+    public void tipo_pago(ParamsAction event) {
+        System.out.println("💳 Procesando comando TIPO_PAGO via ANALEX:");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // tipo_pago get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> tipoPago = dTipoPago.get(id);
+                        sendTableResponse(event.getSender(), "💳 Información de Tipo de Pago", 
+                                        DTipoPago.HEADERS, new ArrayList<>(tipoPago), 
+                                        event.getCommand(), null, null);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmailAsReply(event.getSender(), "ID de tipo de pago inválido: " + event.getParams(0), null, null);
+                    }
+                } else {
+                    // tipo_pago get (listar todos)
+                    List<String[]> tiposPago = dTipoPago.list();
+                    sendTableResponse(event.getSender(), "💳 Lista de Tipos de Pago", 
+                                    DTipoPago.HEADERS, new ArrayList<>(tiposPago), 
+                                    event.getCommand(), null, null);
+                }
+            } else {
+                sendSimpleResponse(event.getSender(), "❌ Acción no soportada", 
+                                 "La acción '" + action + "' no está disponible para tipos de pago. Use 'tipo_pago get'", null, null);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando tipo_pago: " + e.getMessage());
+            sendErrorEmailAsReply(event.getSender(), "Error procesando comando: " + e.getMessage(), null, null);
+        }
+    }
+
     /**
      * Envía respuesta simple via email
      */
@@ -810,8 +1037,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private void processCarritoCommand(String senderEmail, String action, String param, String comando,
             String originalSubject, String messageId) {
         try {
-            // Obtener ID del cliente basado en el email
-            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            // Obtener ID del cliente basado en el email CON VALIDACIÓN DE ROL
+            int clienteId = obtenerClienteIdPorEmailSeguro(senderEmail);
             if (clienteId == 0) {
                 sendSimpleResponse(senderEmail, "❌ Cliente No Configurado",
                         String.format("🔍 PROBLEMA DETECTADO:\n" +
@@ -1050,10 +1277,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
      */
     private void processCheckoutCommand(String senderEmail, String comando, String originalSubject, String messageId) {
         try {
-            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            int clienteId = obtenerClienteIdPorEmailSeguro(senderEmail);
             if (clienteId == 0) {
                 sendSimpleResponse(senderEmail, "❌ Error",
-                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                        "No se encontró perfil de cliente o no tienes permisos. Contacta al administrador.", originalSubject, messageId);
                 return;
             }
 
@@ -1078,10 +1305,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private void processPagoCommand(String senderEmail, String action, String param, String comando,
             String originalSubject, String messageId) {
         try {
-            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            int clienteId = obtenerClienteIdPorEmailSeguro(senderEmail);
             if (clienteId == 0) {
                 sendSimpleResponse(senderEmail, "❌ Error",
-                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                        "No se encontró perfil de cliente o no tienes permisos. Contacta al administrador.", originalSubject, messageId);
                 return;
             }
 
@@ -1130,10 +1357,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private void processVentasCommand(String senderEmail, String action, String param, String comando,
             String originalSubject, String messageId) {
         try {
-            int clienteId = obtenerClienteIdPorEmail(senderEmail);
+            int clienteId = obtenerClienteIdPorEmailSeguro(senderEmail);
             if (clienteId == 0) {
                 sendSimpleResponse(senderEmail, "❌ Error",
-                        "No se encontró perfil de cliente. Contacta al administrador.", originalSubject, messageId);
+                        "No se encontró perfil de cliente o no tienes permisos. Contacta al administrador.", originalSubject, messageId);
                 return;
             }
 
@@ -1183,6 +1410,52 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             System.err.println("❌ Error en ventas: " + e.getMessage());
             sendErrorEmail(senderEmail, "Error procesando consulta de ventas: " + e.getMessage(), originalSubject,
                     messageId);
+        }
+    }
+
+    /**
+     * Valida que el usuario tenga rol de cliente antes de procesar comandos
+     */
+    private boolean validarRolCliente(String email) {
+        try {
+            System.out.println("🔒 Validando rol de cliente para: " + email);
+            
+            // Verificar si el usuario tiene rol 'cliente'
+            boolean tieneRolCliente = dUsuario.tieneRol(email, "cliente");
+            
+            if (!tieneRolCliente) {
+                System.out.println("❌ Usuario " + email + " NO tiene rol de cliente");
+                return false;
+            }
+            
+            System.out.println("✅ Usuario " + email + " tiene rol de cliente válido");
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error validando rol de cliente: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene el ID del cliente basado en su email - CON VALIDACIÓN DE ROL
+     */
+    private int obtenerClienteIdPorEmailSeguro(String email) {
+        try {
+            System.out.println("🔍 Búsqueda segura de cliente para email: " + email);
+
+            // 1. PRIMERO: Validar que tenga rol de cliente
+            if (!validarRolCliente(email)) {
+                System.out.println("❌ Acceso denegado: Usuario no tiene rol de cliente");
+                return 0;
+            }
+
+            // 2. SEGUNDO: Verificar que esté registrado en tabla clientes
+            return obtenerClienteIdPorEmail(email);
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error en búsqueda segura de cliente: " + e.getMessage());
+            return 0;
         }
     }
 

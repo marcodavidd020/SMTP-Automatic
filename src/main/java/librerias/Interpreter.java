@@ -78,32 +78,16 @@ public class Interpreter implements Runnable {
                 IcasoUsoListener.servicio(paramsAction);
                 break;
             case Token.PRODUCTO:
-                // Usar reflection para llamar al método producto si existe
-                try {
-                    java.lang.reflect.Method method = IcasoUsoListener.getClass().getMethod("producto", ParamsAction.class);
-                    method.invoke(IcasoUsoListener, paramsAction);
-                } catch (Exception e) {
-                    // Si no existe el método, usar servicio como fallback
-                    IcasoUsoListener.servicio(paramsAction);
-                }
+                IcasoUsoListener.producto(paramsAction);
                 break;
             case Token.CATEGORIA:
-                // Usar reflection para llamar al método categoria si existe
-                try {
-                    java.lang.reflect.Method method = IcasoUsoListener.getClass().getMethod("categoria", ParamsAction.class);
-                    method.invoke(IcasoUsoListener, paramsAction);
-                } catch (Exception e) {
-                    // Si no existe el método, usar servicio como fallback
-                    IcasoUsoListener.servicio(paramsAction);
-                }
+                IcasoUsoListener.categoria(paramsAction);
                 break;
             case Token.CLIENTE:
-                // Usar usuario como fallback para clientes
-                IcasoUsoListener.usuario(paramsAction);
+                IcasoUsoListener.cliente(paramsAction);
                 break;
             case Token.TIPO_PAGO:
-                // Usar pago como fallback para tipos de pago
-                IcasoUsoListener.pago(paramsAction);
+                IcasoUsoListener.tipo_pago(paramsAction);
                 break;
             case Token.HELP:
                 IcasoUsoListener.help(paramsAction);

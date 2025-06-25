@@ -16,4 +16,10 @@ public interface ICasoUsoListener {
     void servicio(ParamsAction event);
     void error(ParamsAction event); // Método general para manejar errores
     void help(ParamsAction event); // Método para mostrar ayuda
+    
+    // ✅ NUEVOS MÉTODOS PARA INTEGRACIÓN CON ANALEX
+    void producto(ParamsAction event);
+    void categoria(ParamsAction event);
+    void cliente(ParamsAction event);
+    void tipo_pago(ParamsAction event);
 }

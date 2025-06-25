@@ -40,7 +40,7 @@ public class DUsuario {
 
     public List<String[]> get(int id) throws SQLException {
         List<String[]> usuario = new ArrayList<>();
-        String query = "SELECT * FROM users WHERE id = ?";
+        String query = "SELECT * FROM user WHERE id = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -64,7 +64,7 @@ public class DUsuario {
 
     public List<String[]> save(String nombre, String apellido, String telefono, String genero, String email, String password, int rol_id) throws SQLException {
         // Por ahora solo insertar en users básico
-        String query = "INSERT INTO users (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
+        String query = "INSERT INTO user (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, nombre + " " + apellido);
@@ -256,5 +256,61 @@ public class DUsuario {
                 }
             }
         }
+    }
+
+    /**
+     * Obtiene usuario por email incluyendo información del rol
+     * para validaciones de permisos
+     */
+    public List<String[]> getByEmailWithRole(String email) throws SQLException {
+        List<String[]> usuario = new ArrayList<>();
+        String query = "SELECT u.id, u.nombre, u.email, u.rol_id, r.nombre as rol_nombre " +
+                      "FROM usuarios u " +
+                      "LEFT JOIN roles r ON u.rol_id = r.id " +
+                      "WHERE u.email = ?";
+        try (Connection conn = connection.connect();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, email);
+            ResultSet set = ps.executeQuery();
+            if (set.next()) {
+                usuario.add(new String[]{
+                        String.valueOf(set.getInt("id")),
+                        set.getString("nombre"),
+                        set.getString("email"),
+                        String.valueOf(set.getInt("rol_id")),
+                        set.getString("rol_nombre")
+                });
+            } else {
+                throw new SQLException("Usuario no encontrado con email: " + email);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error obteniendo usuario con rol por email: " + e.getMessage());
+            throw e;
+        }
+        return usuario;
+    }
+
+    /**
+     * Verifica si un usuario tiene un rol específico
+     */
+    public boolean tieneRol(String email, String nombreRol) throws SQLException {
+        String query = "SELECT COUNT(*) " +
+                      "FROM usuarios u " +
+                      "JOIN roles r ON u.rol_id = r.id " +
+                      "WHERE u.email = ? AND r.nombre = ?";
+        try (Connection conn = connection.connect();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, email);
+            ps.setString(2, nombreRol);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error verificando rol: " + e.getMessage());
+            throw e;
+        }
+        return false;
     }
 }

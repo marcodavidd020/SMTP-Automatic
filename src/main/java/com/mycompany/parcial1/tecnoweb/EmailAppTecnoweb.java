@@ -12,6 +12,7 @@ import data.DTipoPago;
 import data.DUsuario;
 import interfaces.ICasoUsoListener;
 import librerias.Email;
+import librerias.HtmlRes;
 import librerias.ParamsAction;
 import negocio.NUsuario;
 import postgresConecction.DBConnection;
@@ -336,21 +337,37 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
     }
 
     private void sendWelcomeEmail(String email) {
-        String message = "<h2>¡Bienvenido al Sistema Tecnoweb!</h2>" +
-                "<p>Para usar el sistema, primero debes registrarte enviando un email con el asunto:</p>" +
-                "<p><strong>registrar [Nombre] [Apellido] [Teléfono] [Género]</strong></p>" +
-                "<p>Ejemplo: <em>registrar Juan Pérez 123456789 masculino</em></p>" +
-                "<p><strong>📧 Enviado desde:</strong> " + DBConnection.TecnoWeb.server + "</p>";
-
-        sendEmailViaTecnoweb(email, "Registro requerido - EmailApp Tecnoweb", message);
+        try {
+            // ✅ USAR HtmlRes para generar HTML moderno con estilos CSS
+            String htmlContent = HtmlRes.generateWelcome(email);
+            sendEmailViaTecnoweb(email, "Bienvenido al Sistema Tecnoweb", htmlContent);
+            System.out.println("🎨 Email de bienvenida enviado con estilos HTML modernos (Tecnoweb)");
+        } catch (Exception e) {
+            // Fallback a HTML básico si falla HtmlRes
+            String basicMessage = "<h2>¡Bienvenido al Sistema Tecnoweb!</h2>" +
+                    "<p>Para usar el sistema, primero debes registrarte enviando un email con el asunto:</p>" +
+                    "<p><strong>registrar [Nombre] [Apellido] [Teléfono] [Género]</strong></p>" +
+                    "<p>Ejemplo: <em>registrar Juan Pérez 123456789 masculino</em></p>" +
+                    "<p><strong>📧 Enviado desde:</strong> " + DBConnection.TecnoWeb.server + "</p>";
+            sendEmailViaTecnoweb(email, "Registro requerido - EmailApp Tecnoweb", basicMessage);
+            System.err.println("⚠️ Fallback a HTML básico: " + e.getMessage());
+        }
     }
 
     private void sendErrorEmail(String email, String error) {
-        String message = "<h2>❌ Error en EmailApp Tecnoweb</h2>" +
-                "<p>" + error + "</p>" +
-                "<p>📧 Servidor: " + DBConnection.TecnoWeb.server + "</p>";
-
-        sendEmailViaTecnoweb(email, "Error - EmailApp Tecnoweb", message);
+        try {
+            // ✅ USAR HtmlRes para generar error con estilos CSS
+            String htmlContent = HtmlRes.generateError("Error en Sistema Tecnoweb", error);
+            sendEmailViaTecnoweb(email, "Error - Sistema Tecnoweb", htmlContent);
+            System.out.println("🎨 Email de error enviado con estilos HTML modernos (Tecnoweb)");
+        } catch (Exception e) {
+            // Fallback a HTML básico si falla HtmlRes
+            String basicMessage = "<h2>❌ Error en EmailApp Tecnoweb</h2>" +
+                    "<p>" + error + "</p>" +
+                    "<p>📧 Servidor: " + DBConnection.TecnoWeb.server + "</p>";
+            sendEmailViaTecnoweb(email, "Error - EmailApp Tecnoweb", basicMessage);
+            System.err.println("⚠️ Fallback a HTML básico para error: " + e.getMessage());
+        }
     }
 
     /**
@@ -418,7 +435,183 @@ public class EmailAppTecnoweb implements ICasoUsoListener {
 
     @Override
     public void help(ParamsAction event) {
-        /* Implementación básica */ }
+        try {
+            // ✅ GENERAR HTML MODERNO PARA AYUDA
+            String helpHtml = HtmlRes.generateSuccess("Sistema de Comandos Tecnoweb", 
+                "Comandos disponibles:\n" +
+                "• usuario get - Ver información de usuarios\n" +
+                "• producto get [id] - Ver productos\n" +
+                "• categoria get [id] - Ver categorías\n" +
+                "• cliente get [id] - Ver clientes\n" +
+                "• tipo_pago get [id] - Ver tipos de pago\n\n" +
+                "📧 Sistema vía: mail.tecnoweb.org.bo");
+                
+            sendEmailViaTecnoweb(event.getSender(), "Ayuda - Comandos Disponibles", helpHtml);
+            System.out.println("🎨 Email de ayuda enviado con estilos HTML modernos (Tecnoweb)");
+        } catch (Exception e) {
+            // Fallback a texto básico
+            sendEmailViaTecnoweb(event.getSender(), "Ayuda - Comandos Disponibles", 
+                               "Lista de comandos disponibles en el sistema tecnoweb.");
+            System.err.println("⚠️ Fallback a ayuda básica: " + e.getMessage());
+        }
+    }
+
+    // ✅ NUEVOS MÉTODOS IMPLEMENTADOS PARA ANALEX
+    @Override
+    public void producto(ParamsAction event) {
+        System.out.println("🛍️ Procesando comando PRODUCTO via ANALEX (Tecnoweb):");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // producto get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> producto = dProducto.get(id);
+                        if (!producto.isEmpty()) {
+                            String[] prod = producto.get(0);
+                            String htmlContent = HtmlRes.generateSuccess("🛍️ Información de Producto", 
+                                String.format("Producto encontrado:\n\n" +
+                                    "ID: %s\n" +
+                                    "Nombre: %s\n" +
+                                    "Descripción: %s\n" +
+                                    "Precio: $%s\n\n" +
+                                    "📧 Consultado vía Tecnoweb", 
+                                    prod[0], prod[1], prod.length > 2 ? prod[2] : "N/A", prod.length > 3 ? prod[3] : "N/A"));
+                            sendEmailViaTecnoweb(event.getSender(), "🛍️ Información de Producto", htmlContent);
+                        } else {
+                            sendErrorEmail(event.getSender(), "Producto ID " + id + " no encontrado");
+                        }
+                    } catch (NumberFormatException e) {
+                        sendErrorEmail(event.getSender(), "ID de producto inválido: " + event.getParams(0));
+                    }
+                } else {
+                    // producto get (listar todos)
+                    List<String[]> productos = dProducto.list();
+                    String listContent = String.format("Se encontraron %d productos en el sistema.\n\n" +
+                        "Para ver detalles de un producto específico, use:\n" +
+                        "producto get [ID]\n\n" +
+                        "📧 Sistema Tecnoweb", productos.size());
+                    String htmlContent = HtmlRes.generateSuccess("🛍️ Lista de Productos", listContent);
+                    sendEmailViaTecnoweb(event.getSender(), "🛍️ Lista de Productos", htmlContent);
+                }
+            } else {
+                sendErrorEmail(event.getSender(), "La acción '" + action + "' no está disponible para productos. Use 'producto get'");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando producto: " + e.getMessage());
+            sendErrorEmail(event.getSender(), "Error procesando comando: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void categoria(ParamsAction event) {
+        System.out.println("📂 Procesando comando CATEGORIA via ANALEX (Tecnoweb):");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // categoria get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> categoria = dCategoria.get(id);
+                        String content = "Categoría ID " + id + " encontrada: " + (categoria.isEmpty() ? "No encontrada" : categoria.get(0)[1]);
+                        sendEmailViaTecnoweb(event.getSender(), "📂 Información de Categoría", content);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmail(event.getSender(), "ID de categoría inválido: " + event.getParams(0));
+                    }
+                } else {
+                    // categoria get (listar todas)
+                    List<String[]> categorias = dCategoria.list();
+                    String content = "Se encontraron " + categorias.size() + " categorías en el sistema.";
+                    sendEmailViaTecnoweb(event.getSender(), "📂 Lista de Categorías", content);
+                }
+            } else {
+                sendErrorEmail(event.getSender(), "La acción '" + action + "' no está disponible para categorías. Use 'categoria get'");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando categoria: " + e.getMessage());
+            sendErrorEmail(event.getSender(), "Error procesando comando: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void cliente(ParamsAction event) {
+        System.out.println("👤 Procesando comando CLIENTE via ANALEX (Tecnoweb):");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // cliente get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> cliente = dCliente.get(id);
+                        String content = "Cliente ID " + id + " encontrado: " + (cliente.isEmpty() ? "No encontrado" : cliente.get(0)[1]);
+                        sendEmailViaTecnoweb(event.getSender(), "👤 Información de Cliente", content);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmail(event.getSender(), "ID de cliente inválido: " + event.getParams(0));
+                    }
+                } else {
+                    // cliente get (listar todos)
+                    List<String[]> clientes = dCliente.list();
+                    String content = "Se encontraron " + clientes.size() + " clientes en el sistema.";
+                    sendEmailViaTecnoweb(event.getSender(), "👤 Lista de Clientes", content);
+                }
+            } else {
+                sendErrorEmail(event.getSender(), "La acción '" + action + "' no está disponible para clientes. Use 'cliente get'");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando cliente: " + e.getMessage());
+            sendErrorEmail(event.getSender(), "Error procesando comando: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void tipo_pago(ParamsAction event) {
+        System.out.println("💳 Procesando comando TIPO_PAGO via ANALEX (Tecnoweb):");
+        System.out.println(event.toString());
+        
+        try {
+            librerias.analex.Token token = new librerias.analex.Token();
+            String action = token.getStringToken(event.getAction());
+            
+            if (event.getAction() == librerias.analex.Token.GET) {
+                if (event.countParams() > 0) {
+                    // tipo_pago get <id>
+                    try {
+                        int id = Integer.parseInt(event.getParams(0));
+                        List<String[]> tipoPago = dTipoPago.get(id);
+                        String content = "Tipo de Pago ID " + id + " encontrado: " + (tipoPago.isEmpty() ? "No encontrado" : tipoPago.get(0)[1]);
+                        sendEmailViaTecnoweb(event.getSender(), "💳 Información de Tipo de Pago", content);
+                    } catch (NumberFormatException e) {
+                        sendErrorEmail(event.getSender(), "ID de tipo de pago inválido: " + event.getParams(0));
+                    }
+                } else {
+                    // tipo_pago get (listar todos)
+                    List<String[]> tiposPago = dTipoPago.list();
+                    String content = "Se encontraron " + tiposPago.size() + " tipos de pago en el sistema.";
+                    sendEmailViaTecnoweb(event.getSender(), "💳 Lista de Tipos de Pago", content);
+                }
+            } else {
+                sendErrorEmail(event.getSender(), "La acción '" + action + "' no está disponible para tipos de pago. Use 'tipo_pago get'");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error procesando comando tipo_pago: " + e.getMessage());
+            sendErrorEmail(event.getSender(), "Error procesando comando: " + e.getMessage());
+        }
+    }
 
     /**
      * Método principal para testing
