@@ -32,6 +32,7 @@
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPago.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPatrocinador.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPatrocinio.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NProducto.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NProveedor.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NRol.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NServicio.java
@@ -72,6 +73,7 @@
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestEmailAuthentication.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestFixUser.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestHtmlMejorado.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestProductoDirecto.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestRealStructure.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestRegistroConRol2.java
 /mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestSimpleAuth.java

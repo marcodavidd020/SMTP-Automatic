@@ -33,8 +33,8 @@ public class DProducto {
 
     public List<String[]> get(int id) throws SQLException {
         List<String[]> producto = new ArrayList<>();
-        String query = "SELECT p.*, c.nombre as categoria_nombre FROM productos p " +
-                      "LEFT JOIN categorias c ON p.categoria_id = c.id WHERE p.id = ?";
+        String query = "SELECT p.*, c.nombre as categoria_nombre FROM producto p " +
+                      "LEFT JOIN categoria c ON p.categoria_id = c.id WHERE p.id = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -62,8 +62,8 @@ public class DProducto {
 
     public List<String[]> list() throws SQLException {
         List<String[]> productos = new ArrayList<>();
-        String query = "SELECT p.*, c.nombre as categoria_nombre FROM productos p " +
-                      "LEFT JOIN categorias c ON p.categoria_id = c.id ORDER BY p.id";
+        String query = "SELECT p.*, c.nombre as categoria_nombre FROM producto p " +
+                      "LEFT JOIN categoria c ON p.categoria_id = c.id ORDER BY p.id";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ResultSet set = ps.executeQuery();
@@ -90,8 +90,8 @@ public class DProducto {
 
     public List<String[]> listByCategory(int categoriaId) throws SQLException {
         List<String[]> productos = new ArrayList<>();
-        String query = "SELECT p.*, c.nombre as categoria_nombre FROM productos p " +
-                      "LEFT JOIN categorias c ON p.categoria_id = c.id " +
+        String query = "SELECT p.*, c.nombre as categoria_nombre FROM producto p " +
+                      "LEFT JOIN categoria c ON p.categoria_id = c.id " +
                       "WHERE p.categoria_id = ? ORDER BY p.nombre";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {

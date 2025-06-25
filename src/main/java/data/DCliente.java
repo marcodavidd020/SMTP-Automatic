@@ -31,10 +31,10 @@ public class DCliente {
 
     public List<String[]> get(int id) throws SQLException {
         List<String[]> cliente = new ArrayList<>();
-        String query = "SELECT c.*, u.nombre as nombre_usuario, u.email as email_usuario " +
-                      "FROM cliente c " +
-                      "LEFT JOIN user u ON c.user_id = u.id " +
-                      "WHERE c.id = ?";
+        String query = "SELECT c.*, u.\"nombre\" as nombre_usuario, u.\"email\" as email_usuario " +
+                      "FROM \"cliente\" c " +
+                      "LEFT JOIN \"user\" u ON c.\"user_id\" = u.\"id\" " +
+                      "WHERE c.\"id\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -59,10 +59,10 @@ public class DCliente {
 
     public List<String[]> list() throws SQLException {
         List<String[]> clientes = new ArrayList<>();
-        String query = "SELECT c.*, u.nombre as nombre_usuario, u.email as email_usuario " +
-                      "FROM cliente c " +
-                      "LEFT JOIN user u ON c.user_id = u.id " +
-                      "ORDER BY c.id";
+        String query = "SELECT c.*, u.\"nombre\" as nombre_usuario, u.\"email\" as email_usuario " +
+                      "FROM \"cliente\" c " +
+                      "LEFT JOIN \"user\" u ON c.\"user_id\" = u.\"id\" " +
+                      "ORDER BY c.\"id\"";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ResultSet set = ps.executeQuery();

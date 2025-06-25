@@ -152,7 +152,7 @@ public class DUsuario {
      * Verifica si un usuario existe por email
      */
     public boolean existsByEmail(String email) throws SQLException {
-        String query = "SELECT COUNT(*) FROM user WHERE email = ?";
+        String query = "SELECT COUNT(*) FROM \"user\" WHERE \"email\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);
@@ -172,7 +172,7 @@ public class DUsuario {
      */
     public List<String[]> getByEmail(String email) throws SQLException {
         List<String[]> usuario = new ArrayList<>();
-        String query = "SELECT * FROM user WHERE email = ?";
+        String query = "SELECT * FROM \"user\" WHERE \"email\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);
@@ -214,7 +214,7 @@ public class DUsuario {
             conn.setAutoCommit(false); // Iniciar transacción
 
             // ✅ 1. CREAR USUARIO (tabla 'user' de Laravel)
-            String userQuery = "INSERT INTO user (nombre, celular, email, genero, password, estado, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'activo', NOW(), NOW()) RETURNING id";
+            String userQuery = "INSERT INTO \"user\" (\"nombre\", \"celular\", \"email\", \"genero\", \"password\", \"estado\", \"created_at\", \"updated_at\") VALUES (?, ?, ?, ?, ?, 'activo', NOW(), NOW()) RETURNING \"id\"";
             int userId;
             try (PreparedStatement ps = conn.prepareStatement(userQuery)) {
                 ps.setString(1, fullName);
@@ -233,7 +233,7 @@ public class DUsuario {
             }
 
             // ✅ 2. CREAR CLIENTE ASOCIADO (tabla 'cliente' de Laravel - solo NIT)
-            String clientQuery = "INSERT INTO cliente (user_id, nit, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
+            String clientQuery = "INSERT INTO \"cliente\" (\"user_id\", \"nit\", \"created_at\", \"updated_at\") VALUES (?, ?, NOW(), NOW())";
             try (PreparedStatement ps = conn.prepareStatement(clientQuery)) {
                 ps.setInt(1, userId);
                 ps.setString(2, "AUTO-" + userId); // NIT automático
@@ -247,7 +247,7 @@ public class DUsuario {
             }
 
             // ✅ 3. ASIGNAR ROL DE CLIENTE (user_rol) - USAR ROL_ID = 2 DIRECTAMENTE
-            String userRolQuery = "INSERT INTO user_rol (user_id, rol_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
+            String userRolQuery = "INSERT INTO \"user_rol\" (\"user_id\", \"rol_id\", \"created_at\", \"updated_at\") VALUES (?, ?, NOW(), NOW())";
             try (PreparedStatement ps = conn.prepareStatement(userRolQuery)) {
                 ps.setInt(1, userId);
                 ps.setInt(2, 2); // ✅ ROL_ID = 2 para cliente
@@ -303,11 +303,11 @@ public class DUsuario {
      */
     public List<String[]> getByEmailWithRole(String email) throws SQLException {
         List<String[]> usuario = new ArrayList<>();
-        String query = "SELECT u.id, u.nombre, u.email, r.id as rol_id, r.nombre as rol_nombre " +
-                      "FROM user u " +
-                      "LEFT JOIN user_rol ur ON u.id = ur.user_id " +
-                      "LEFT JOIN rol r ON ur.rol_id = r.id " +
-                      "WHERE u.email = ?";
+        String query = "SELECT u.\"id\", u.\"nombre\", u.\"email\", r.\"id\" as rol_id, r.\"nombre\" as rol_nombre " +
+                      "FROM \"user\" u " +
+                      "LEFT JOIN \"user_rol\" ur ON u.\"id\" = ur.\"user_id\" " +
+                      "LEFT JOIN \"rol\" r ON ur.\"rol_id\" = r.\"id\" " +
+                      "WHERE u.\"email\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);
@@ -335,10 +335,10 @@ public class DUsuario {
      */
     public boolean tieneRol(String email, String nombreRol) throws SQLException {
         String query = "SELECT COUNT(*) " +
-                      "FROM user u " +
-                      "JOIN user_rol ur ON u.id = ur.user_id " +
-                      "JOIN rol r ON ur.rol_id = r.id " +
-                      "WHERE u.email = ? AND r.nombre = ?";
+                      "FROM \"user\" u " +
+                      "JOIN \"user_rol\" ur ON u.\"id\" = ur.\"user_id\" " +
+                      "JOIN \"rol\" r ON ur.\"rol_id\" = r.\"id\" " +
+                      "WHERE u.\"email\" = ? AND r.\"nombre\" = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);

@@ -31,7 +31,7 @@ public class DCategoria {
 
     public List<String[]> get(int id) throws SQLException {
         List<String[]> categoria = new ArrayList<>();
-        String query = "SELECT * FROM categorias WHERE id = ?";
+        String query = "SELECT * FROM categoria WHERE id = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -54,7 +54,7 @@ public class DCategoria {
 
     public List<String[]> list() throws SQLException {
         List<String[]> categorias = new ArrayList<>();
-        String query = "SELECT * FROM categorias ORDER BY nombre";
+        String query = "SELECT * FROM categoria ORDER BY nombre";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ResultSet set = ps.executeQuery();

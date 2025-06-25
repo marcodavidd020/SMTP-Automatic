@@ -373,6 +373,36 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         // ✅ HELP: Procesar directamente sin ANALEX
                         processHelpCommand(senderEmail, comando, originalSubject, messageId);
                         return;
+                    case "producto":
+                        // 🛠️ FIX: Usar fallback directo para producto get (problema con ANALEX)
+                        String productoAction = parts.length > 1 ? parts[1] : "get";
+                        String productoParam = parts.length > 2 ? parts[2] : null;
+                        processProductoCommand(senderEmail, productoAction, productoParam, comando, originalSubject, messageId);
+                        return;
+                    case "categoria":
+                        // 🛠️ FIX: Usar fallback directo para categoria get (problema con ANALEX)
+                        String categoriaAction = parts.length > 1 ? parts[1] : "get";
+                        String categoriaParam = parts.length > 2 ? parts[2] : null;
+                        processCategoriaCommand(senderEmail, categoriaAction, categoriaParam, comando, originalSubject, messageId);
+                        return;
+                    case "cliente":
+                        // 🛠️ FIX: Usar fallback directo para cliente get (problema con ANALEX)
+                        String clienteAction = parts.length > 1 ? parts[1] : "get";
+                        String clienteParam = parts.length > 2 ? parts[2] : null;
+                        processClienteCommand(senderEmail, clienteAction, clienteParam, comando, originalSubject, messageId);
+                        return;
+                    case "usuario":
+                        // 🛠️ FIX: Usar fallback directo para usuario get (problema con ANALEX)
+                        String usuarioAction = parts.length > 1 ? parts[1] : "get";
+                        String usuarioParam = parts.length > 2 ? parts[2] : null;
+                        processUsuarioCommand(senderEmail, usuarioAction, usuarioParam, comando, originalSubject, messageId);
+                        return;
+                    case "tipo_pago":
+                        // 🛠️ FIX: Usar fallback directo para tipo_pago get (problema con ANALEX)
+                        String tipoAction = parts.length > 1 ? parts[1] : "get";
+                        String tipoParam = parts.length > 2 ? parts[2] : null;
+                        processTipoPagoCommand(senderEmail, tipoAction, tipoParam, comando, originalSubject, messageId);
+                        return;
                     case "carrito":
                         String action = parts.length > 1 ? parts[1] : "get";
                         String param = parts.length > 2 ? parts[2] : null;
