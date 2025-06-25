@@ -24,7 +24,7 @@ public class TestHTMLEmail {
             System.out.println("\n1. 📨 Generando HTML de bienvenida...");
             
             java.lang.reflect.Method welcomeMethod = htmlResClass.getMethod("generateWelcome", String.class);
-            String htmlBienvenida = (String) welcomeMethod.invoke(null, "marcodavidtoledocanna@gmail.com");
+            String htmlBienvenida = (String) welcomeMethod.invoke(null, "JairoJairoJairoJairo@gmail.com");
             
             // Enviar email HTML
             System.out.println("2. 📧 Enviando email HTML...");
@@ -34,7 +34,7 @@ public class TestHTMLEmail {
             
             sendMethod.invoke(relay, 
                 "servidor-independiente@localhost",
-                "marcodavidtoledocanna@gmail.com", 
+                "JairoJairoJairoJairo@gmail.com", 
                 "Bienvenida - HTML Moderno",
                 htmlBienvenida);
             
@@ -58,7 +58,7 @@ public class TestHTMLEmail {
             
             sendMethod.invoke(relay, 
                 "servidor-independiente@localhost",
-                "marcodavidtoledocanna@gmail.com", 
+                "JairoJairoJairoJairo@gmail.com", 
                 "Lista de Comandos - HTML Moderno",
                 htmlTabla);
             

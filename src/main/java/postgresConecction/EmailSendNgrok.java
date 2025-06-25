@@ -19,7 +19,7 @@ import librerias.Email;
 
 /**
  * Envío de emails a través de servidor SMTP propio usando ngrok
- * @author MARCO
+ * @author Jairo
  */
 public class EmailSendNgrok implements Runnable {
 

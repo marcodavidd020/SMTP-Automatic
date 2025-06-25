@@ -11,8 +11,8 @@ public class TestGmail {
         try {
             GmailRelay relay = new GmailRelay();
             
-            String from = "marcodavidtoledo@gmail.com";
-            String to = "marcodavidtoledocanna@gmail.com";
+            String from = "JairoJairoJairo@gmail.com";
+            String to = "JairoJairoJairoJairo@gmail.com";
             String subject = "Prueba directa de Gmail";
             String message = "Este es un mensaje de prueba enviado directamente desde el GmailRelay para verificar que las credenciales funcionan correctamente.";
             

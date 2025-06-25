@@ -9,7 +9,7 @@ import librerias.analex.Token;
  * Prueba la integración completa del analizador léxico (analex) 
  * con las aplicaciones de email
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class TestIntegracionAnalex {
 

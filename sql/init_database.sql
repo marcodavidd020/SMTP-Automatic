@@ -191,7 +191,7 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO usuarios (nombre, apellido, telefono, genero, email, password, rol_id) VALUES 
     ('Admin', 'Sistema', '123456789', 'M', 'admin@sistema.com', 'admin123', 1),
-    ('Marco David', 'Toledo', '987654321', 'M', 'marcodavidtoledo@gmail.com', 'marco123', 1),
+    ('Jairo Jairo', 'Jairo', '987654321', 'M', 'JairoJairoJairo@gmail.com', 'Jairo123', 1),
     ('Usuario', 'Prueba', '555123456', 'M', 'test@test.com', 'test123', 2)
 ON CONFLICT (email) DO NOTHING;
 

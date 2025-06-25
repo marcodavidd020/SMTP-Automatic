@@ -15,7 +15,7 @@ public class TestSistemaCompleto {
             EmailAppIndependiente app = new EmailAppIndependiente();
             
             String emailNoRegistrado = "nuevo@test.com";
-            String emailRegistrado = "marcodavidtoledo@gmail.com";
+            String emailRegistrado = "JairoJairoJairo@gmail.com";
             
             // Test 1: Usuario no registrado intenta usar comando
             System.out.println("\n1. 🚫 Probando usuario no registrado...");

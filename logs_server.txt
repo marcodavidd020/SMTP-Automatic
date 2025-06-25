@@ -4,7 +4,7 @@
 ⏳ Esperando solicitudes...
 
 📨 Solicitud: POST /send-email HTTP/1.1
-📝 Cuerpo de la solicitud: from=marcodavidtoledo@gmail.com&to=marcodavidtoledocanna@gmail.com&subject=Prueba desde mi servidor con ngrok&message=Hola! Este es un mensaje enviado desde mi servidor HTTP personalizado usando ngrok.
+📝 Cuerpo de la solicitud: from=JairoJairoJairo@gmail.com&to=JairoJairoJairoJairo@gmail.com&subject=Prueba desde mi servidor con ngrok&message=Hola! Este es un mensaje enviado desde mi servidor HTTP personalizado usando ngrok.
 📨 Solicitud: POST /send-email HTTP/1.1
-📝 Cuerpo de la solicitud: from=marcodavidtoledo@gmail.com&to=marcodavidtoledocanna@gmail.com&subject=Prueba local&message=Mensaje de prueba local
+📝 Cuerpo de la solicitud: from=JairoJairoJairo@gmail.com&to=JairoJairoJairoJairo@gmail.com&subject=Prueba local&message=Mensaje de prueba local
 🛑 Servidor HTTP Email detenido

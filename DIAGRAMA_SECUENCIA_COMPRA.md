@@ -155,5 +155,5 @@ sequenceDiagram
 ---
 
 _Diagrama de Secuencia del Sistema de E-commerce por Email v1.0_  
-_Desarrollado por: Marco David Toledo_  
+_Desarrollado por: Jairo Jairo Jairo_  
 _Fecha: Diciembre 2024_ 

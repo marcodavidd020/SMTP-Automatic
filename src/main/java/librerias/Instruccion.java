@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class Instruccion {
     private int casoUso; // CASO DE USO

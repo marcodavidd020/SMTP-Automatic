@@ -5,8 +5,8 @@ import com.mycompany.parcial1.tecnoweb.EmailAppIndependiente;
 /**
  * 🚀 LANZADOR PRINCIPAL - SISTEMA DE EMAIL CON COMANDOS
  * 
- * @author Marco David Toledo
- * @email marcodavidtoledo@gmail.com
+ * @author Jairo Jairo Jairo
+ * @email JairoJairoJairo@gmail.com
  * @version 2.0 - Diciembre 2024
  */
 public class LanzadorPrincipal {
@@ -43,8 +43,8 @@ public class LanzadorPrincipal {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("🚀    SISTEMA DE EMAIL CON COMANDOS - v2.0");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        System.out.println("👨‍💻 Desarrollador: Marco David Toledo");
-        System.out.println("📧 Email: marcodavidtoledo@gmail.com");
+        System.out.println("👨‍💻 Desarrollador: Jairo Jairo Jairo");
+        System.out.println("📧 Email: JairoJairoJairo@gmail.com");
         System.out.println("🗄️ Base de datos: PostgreSQL local");
         System.out.println("📬 Monitoreo: Gmail IMAP en tiempo real");
         System.out.println();
@@ -101,7 +101,7 @@ public class LanzadorPrincipal {
     private static void ejecutarMonitorGmail() {
         System.out.println("\n🤖 INICIANDO MONITOR GMAIL...");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Monitoreando: JairoJairoJairo@gmail.com");
         System.out.println("🎯 Detecta comandos en ASUNTO y CONTENIDO");
         System.out.println("📝 Procesa respuestas a emails del sistema");
         System.out.println();
@@ -169,7 +169,7 @@ public class LanzadorPrincipal {
             System.out.println("❌ No se pudo obtener configuración de BD");
         }
         
-        System.out.println("📧 Gmail: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Gmail: JairoJairoJairo@gmail.com");
         System.out.println();
         
         System.out.println("📝 COMANDOS IMPLEMENTADOS:");
@@ -204,7 +204,7 @@ public class LanzadorPrincipal {
         
         System.out.println("📖 CÓMO USAR:");
         System.out.println("   1. Ejecuta el Monitor Gmail (opción 1)");
-        System.out.println("   2. Envía email a: marcodavidtoledo@gmail.com");
+        System.out.println("   2. Envía email a: JairoJairoJairo@gmail.com");
         System.out.println("   3. Pon el comando en el asunto O en el contenido");
         System.out.println("   4. El sistema responde automáticamente");
         System.out.println("   5. Puedes responder al email con nuevos comandos");

@@ -9,7 +9,7 @@ import java.net.Socket;
 /**
  * Cliente SMTP para probar el servidor personalizado
  *
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPClient {
 
@@ -76,8 +76,8 @@ public class SMTPClient {
 
             // Enviar email de prueba
             client.sendEmail(
-                    "marcodavidtoledo@gmail.com",
-                    "marcodavidtoledo@gmail.com",
+                    "JairoJairoJairo@gmail.com",
+                    "JairoJairoJairo@gmail.com",
                     "Prueba desde mi servidor",
                     "¡Hola! Este es un mensaje enviado desde mi propio servidor SMTP.\n\n"
                     + "El servidor recibe el mensaje y lo reenvía a través de Gmail.\n"

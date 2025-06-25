@@ -9,7 +9,7 @@ import librerias.analex.Utils;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class TSParams {
     private static String TITLE = "TSParams";

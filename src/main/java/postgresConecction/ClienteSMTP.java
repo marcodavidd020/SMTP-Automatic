@@ -6,7 +6,7 @@ package postgresConecction;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,7 +22,7 @@ public class ClienteSMTP {
         String servidor = "mail.tecnoweb.org.bo";
         // String servidor="172.20.172.254";
         String user_receptor = "grupo21sc@tecnoweb.org.bo";
-        String user_emisor = "marcodavidtoledo@gmail.com";
+        String user_emisor = "JairoJairoJairo@gmail.com";
         String line;
         String comando = "";
         int puerto = 25;

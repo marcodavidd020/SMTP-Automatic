@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 🚀 Script de Compilación - Sistema de Email Personalizado
-# Autor: Marco David Toledo
+# Autor: Jairo Jairo Jairo
 
 echo "🚀 Sistema de Email Personalizado - Compilación"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

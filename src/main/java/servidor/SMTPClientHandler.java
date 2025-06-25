@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Maneja las conexiones de clientes SMTP y procesa los comandos
  *
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPClientHandler implements Runnable {
 

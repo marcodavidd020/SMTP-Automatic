@@ -13,7 +13,7 @@ import postgresConecction.DBConnectionManager;
 
 /**
  * DAO para manejar operaciones de ventas y checkout
- * @author MARCO
+ * @author Jairo
  */
 public class DVenta {
     

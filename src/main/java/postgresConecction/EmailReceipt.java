@@ -21,7 +21,7 @@ import librerias.Email;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class EmailReceipt implements Runnable {
 

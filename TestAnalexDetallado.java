@@ -6,7 +6,7 @@ import librerias.analex.Token;
  * 
  * Identifica específicamente dónde está el problema con el análisis léxico
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class TestAnalexDetallado {
 

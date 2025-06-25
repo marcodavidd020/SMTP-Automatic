@@ -11,15 +11,15 @@ import servidor.HTTPEmailServer;
  * Lanzador principal que permite elegir entre diferentes modos de
  * funcionamiento
  *
- * @author MARCO
+ * @author Jairo
  */
 public class LanzadorPrincipal {
 
     public static void main(String[] args) {
         System.out.println("🚀 SISTEMA DE EMAIL PERSONALIZADO");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        System.out.println("👨‍💻 Desarrollador: Marco David Toledo");
-        System.out.println("📧 Email: marcodavidtoledo@gmail.com");
+        System.out.println("👨‍💻 Desarrollador: Jairo Jairo Jairo");
+        System.out.println("📧 Email: JairoJairoJairo@gmail.com");
         System.out.println();
 
         mostrarMenu();
@@ -112,7 +112,7 @@ public class LanzadorPrincipal {
     
     private static void ejecutarMonitorGmailComandosLocal() {
         System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce (LOCAL)...");
-        System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Monitoreando: JairoJairoJairo@gmail.com");
         System.out.println("🗄️ Base de datos: " + DBConnection.database + " en " + DBConnection.server);
         System.out.println("🛒 Sistema completo de carrito, checkout y pagos");
         System.out.println();
@@ -133,7 +133,7 @@ public class LanzadorPrincipal {
     
     private static void ejecutarMonitorGmailComandosTecnoweb() {
         System.out.println("\n🤖 Iniciando Monitor Gmail con Sistema E-commerce (TECNOWEB)...");
-        System.out.println("📧 Monitoreando: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Monitoreando: JairoJairoJairo@gmail.com");
         System.out.println("🗄️ Base de datos: " + DBConnection.TecnoWeb.database + " en " + DBConnection.TecnoWeb.server);
         System.out.println("🛒 Sistema E-commerce conectado a Tecnoweb");
         System.out.println();
@@ -232,7 +232,7 @@ public class LanzadorPrincipal {
         System.out.println("📊 Base de datos: " + DBConnection.database);
         System.out.println("🖥️ Servidor DB: " + DBConnection.server + ":" + DBConnection.port);
         System.out.println("👤 Usuario DB: " + DBConnection.user);
-        System.out.println("📧 Gmail: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Gmail: JairoJairoJairo@gmail.com");
 
         System.out.println("\n🆚 DIFERENCIAS ENTRE VERSIONES:");
         System.out.println("📧 TECNOWEB:");

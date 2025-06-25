@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * Clase para probar la conexión a la base de datos
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class TestConnection {
 

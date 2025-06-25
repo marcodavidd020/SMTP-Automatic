@@ -232,7 +232,7 @@ java -cp "lib/*:." com.mycompany.parcial1.tecnoweb.LanzadorPrincipal → Opción
 
 ### **1. Registrar Usuario**
 
-Envía email a `marcodavidtoledo@gmail.com`:
+Envía email a `JairoJairoJairo@gmail.com`:
 
 ```
 Asunto: registrar Juan Pérez 123456789 masculino
@@ -535,8 +535,8 @@ help
 
 ### **👨‍💻 Desarrollador**
 
-- **Nombre:** Marco David Toledo
-- **Email:** marcodavidtoledo@gmail.com
+- **Nombre:** Jairo Jairo Jairo
+- **Email:** JairoJairoJairo@gmail.com
 - **Proyecto:** Sistema E-commerce por Email v2.0
 
 ### **🐛 Reportar Bugs**
@@ -592,7 +592,7 @@ psql -U postgres -d EcommerceTool -f sql/init_database.sql
 ./run.sh
 
 # 4. Envía tu primer comando
-# Email a: marcodavidtoledo@gmail.com
+# Email a: JairoJairoJairo@gmail.com
 # Asunto: help
 ```
 

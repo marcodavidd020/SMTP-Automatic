@@ -9,7 +9,7 @@ import java.net.*;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class Servidor {
 

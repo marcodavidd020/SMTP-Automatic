@@ -17,7 +17,7 @@ public class TestEmailAppTecnoweb {
         
         // Test 1: Comando help
         System.out.println("\n1️⃣ Test comando 'help':");
-        app.processEmailCommand("marcodavidtoledo20@gmail.com", "help", "Solicito ayuda");
+        app.processEmailCommand("JairoJairoJairo20@gmail.com", "help", "Solicito ayuda");
         
         try {
             Thread.sleep(3000); // Esperar envío
@@ -27,7 +27,7 @@ public class TestEmailAppTecnoweb {
         
         // Test 2: Comando usuario get
         System.out.println("\n2️⃣ Test comando 'usuario get':");
-        app.processEmailCommand("marcodavidtoledo20@gmail.com", "usuario get", "Lista usuarios");
+        app.processEmailCommand("JairoJairoJairo20@gmail.com", "usuario get", "Lista usuarios");
         
         try {
             Thread.sleep(3000); // Esperar envío

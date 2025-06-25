@@ -14,7 +14,7 @@ import postgresConecction.DBConnectionManager;
 /**
  * DAO para manejar operaciones del carrito de compras
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class DCarrito {
 

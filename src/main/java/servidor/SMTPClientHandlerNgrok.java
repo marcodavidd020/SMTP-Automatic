@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Handler SMTP optimizado para conexiones a través de ngrok
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPClientHandlerNgrok implements Runnable {
     

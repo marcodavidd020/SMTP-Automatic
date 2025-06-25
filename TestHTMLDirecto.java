@@ -21,7 +21,7 @@ public class TestHTMLDirecto {
             
             // Usar reflexión para llamar al método
             java.lang.reflect.Method welcomeMethod = htmlResClass.getMethod("generateWelcome", String.class);
-            String htmlBienvenida = (String) welcomeMethod.invoke(null, "marcodavidtoledo@gmail.com");
+            String htmlBienvenida = (String) welcomeMethod.invoke(null, "JairoJairoJairo@gmail.com");
             
             // Guardar HTML
             java.nio.file.Files.write(java.nio.file.Paths.get("test_bienvenida_directo.html"), 

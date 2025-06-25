@@ -4,7 +4,7 @@ package postgresConecction;
  * Gestor de configuración global de base de datos
  * Permite cambiar fácilmente entre configuración local y remota (Tecnoweb)
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class DBConnectionManager {
     

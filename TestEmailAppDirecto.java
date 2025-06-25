@@ -16,7 +16,7 @@ public class TestEmailAppDirecto {
 
             // Test 1: Usuario registrado (tu email)
             System.out.println("\n1. 🔍 Probando usuario REGISTRADO...");
-            String emailRegistrado = "marcodavidtoledo@gmail.com";
+            String emailRegistrado = "JairoJairoJairo@gmail.com";
 
             java.lang.reflect.Method processMethod = emailAppClass.getMethod("processEmailCommand",
                     String.class, String.class, String.class);

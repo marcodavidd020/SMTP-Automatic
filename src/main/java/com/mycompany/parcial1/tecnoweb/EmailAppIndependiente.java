@@ -26,7 +26,7 @@ import servidor.GmailRelay;
  * Versión independiente del EmailApp que usa el servidor independiente
  * y responde automáticamente a emails con comandos
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class EmailAppIndependiente implements ICasoUsoListener {
 

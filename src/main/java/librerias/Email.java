@@ -6,7 +6,7 @@ package librerias;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class Email {
 

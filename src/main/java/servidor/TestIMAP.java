@@ -17,7 +17,7 @@ public class TestIMAP {
         System.out.println("🧪 Probando conexión IMAP a Gmail...");
         
         String host = "imap.gmail.com";
-        String username = "marcodavidtoledo@gmail.com";
+        String username = "JairoJairoJairo@gmail.com";
         String password = "muknnpzrymdkduss";
         
         try {

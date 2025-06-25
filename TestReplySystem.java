@@ -16,7 +16,7 @@ public class TestReplySystem {
             System.out.println("✅ EmailAppIndependiente cargado correctamente");
 
             // Datos de prueba para simular emails con Message-ID
-            String emailRegistrado = "marcodavidtoledo@gmail.com";
+            String emailRegistrado = "JairoJairoJairo@gmail.com";
             String originalSubject = "Test de comandos en secuencia";
             String messageId = "<test-message-123@gmail.com>";
 

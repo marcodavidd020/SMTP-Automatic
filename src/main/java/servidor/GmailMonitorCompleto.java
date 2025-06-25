@@ -21,14 +21,14 @@ import com.mycompany.parcial1.tecnoweb.EmailAppIndependiente;
 
 /**
  * Monitor completo que maneja TODOS los comandos correctamente
- * @author MARCO
+ * @author Jairo
  */
 public class GmailMonitorCompleto {
     
     // 🔧 CONFIGURACIÓN DE GMAIL IMAP
     private static final String IMAP_HOST = "imap.gmail.com";
     private static final String IMAP_PORT = "993";
-    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
+    private static final String GMAIL_USERNAME = "JairoJairoJairo@gmail.com";
     private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss";
     
     private Session session;

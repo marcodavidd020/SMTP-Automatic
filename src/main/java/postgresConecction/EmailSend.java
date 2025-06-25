@@ -24,7 +24,7 @@ import librerias.Email;
 /**
  * Clase de envío de emails que puede usar diferentes servidores SMTP
  *
- * @author MARCO
+ * @author Jairo
  */
 public class EmailSend implements Runnable {
 

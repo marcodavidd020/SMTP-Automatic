@@ -24,14 +24,14 @@ import postgresConecction.DBConnectionManager;
  * Monitor que revisa emails recientes y procesa comandos usando
  * EmailAppIndependiente
  * 
- * @author MARCO
+ * @author Jairo
  */
 public class GmailMonitorComandos {
 
     // 🔧 CONFIGURACIÓN DE GMAIL IMAP
     private static final String IMAP_HOST = "imap.gmail.com";
     private static final String IMAP_PORT = "993";
-    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
+    private static final String GMAIL_USERNAME = "JairoJairoJairo@gmail.com";
     private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss";
 
     private Session session;
@@ -520,8 +520,8 @@ public class GmailMonitorComandos {
                 "📋 INFORMACIÓN DEL PROYECTO:\n" +
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                 "🚀 Proyecto: Sistema de Email HTTP Personalizado + CRUD via Email\n" +
-                "👨‍💻 Desarrollador: Marco David Toledo\n" +
-                "📧 Email: marcodavidtoledo@gmail.com\n" +
+                "👨‍💻 Desarrollador: Jairo Jairo Jairo\n" +
+                "📧 Email: JairoJairoJairo@gmail.com\n" +
                 "🌐 Servidor: https://340c-181-188-162-193.ngrok-free.app\n\n" +
                 "🔧 CARACTERÍSTICAS:\n" +
                 "• ✅ Servidor HTTP de emails independiente\n" +
@@ -554,7 +554,7 @@ public class GmailMonitorComandos {
                 + "\n\n" +
                 "Si necesitas una respuesta personalizada o ejecutar comandos CRUD, te contactaré pronto.\n\n" +
                 "¡Saludos!\n" +
-                "Marco\n\n" +
+                "Jairo\n\n" +
                 "---\n" +
                 "🤖 Este es un mensaje automático generado por mi servidor HTTP personalizado.\n" +
                 "📅 Fecha: " + new Date() + "\n" +

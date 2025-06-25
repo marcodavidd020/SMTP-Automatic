@@ -301,7 +301,7 @@ java -cp "lib/*:." servidor.GmailMonitorComandos
 
 ```bash
 # 1. Registrarse
-📧 A: marcodavidtoledo@gmail.com
+📧 A: JairoJairoJairo@gmail.com
 📝 Asunto: registrar Juan Pérez 987654321 masculino
 
 # 2. Explorar productos  
@@ -349,5 +349,5 @@ El sistema de **e-commerce por email** está **completamente implementado y prob
 ---
 
 _Documentación del Sistema de E-commerce por Email v1.0_  
-_Desarrollado por: Marco David Toledo_  
+_Desarrollado por: Jairo Jairo Jairo_  
 _Fecha: Diciembre 2024_ 

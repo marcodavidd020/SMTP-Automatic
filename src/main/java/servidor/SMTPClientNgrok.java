@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 /**
  * Cliente SMTP para conectar al servidor a través de ngrok
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPClientNgrok {
     

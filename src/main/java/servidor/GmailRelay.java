@@ -14,7 +14,7 @@ import javax.mail.internet.MimeMessage;
 /**
  * Relay que envía emails a través de Gmail usando las credenciales configuradas
  *
- * @author MARCO
+ * @author Jairo
  */
 public class GmailRelay {
 
@@ -24,7 +24,7 @@ public class GmailRelay {
     private static final boolean USE_SSL = true;
 
     // ⚠️ CAMBIAR ESTAS CREDENCIALES POR LAS TUYAS:
-    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
+    private static final String GMAIL_USERNAME = "JairoJairoJairo@gmail.com";
     private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss"; // Contraseña de aplicación
 
     private final Session session;

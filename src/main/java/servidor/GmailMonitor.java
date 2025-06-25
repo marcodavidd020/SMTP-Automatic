@@ -15,14 +15,14 @@ import javax.mail.search.FlagTerm;
 
 /**
  * Monitor que revisa emails entrantes en Gmail y responde automáticamente
- * @author MARCO
+ * @author Jairo
  */
 public class GmailMonitor {
     
     // 🔧 CONFIGURACIÓN DE GMAIL IMAP
     private static final String IMAP_HOST = "imap.gmail.com";
     private static final String IMAP_PORT = "993";
-    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
+    private static final String GMAIL_USERNAME = "JairoJairoJairo@gmail.com";
     private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss";
     
     private Session session;
@@ -194,8 +194,8 @@ public class GmailMonitor {
                "📋 INFORMACIÓN DEL PROYECTO:\n" +
                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                "🚀 Proyecto: Sistema de Email HTTP Personalizado\n" +
-               "👨‍💻 Desarrollador: Marco David Toledo\n" +
-               "📧 Email: marcodavidtoledo@gmail.com\n" +
+               "👨‍💻 Desarrollador: Jairo Jairo Jairo\n" +
+               "📧 Email: JairoJairoJairo@gmail.com\n" +
                "🌐 Servidor: https://340c-181-188-162-193.ngrok-free.app\n\n" +
                "🔧 CARACTERÍSTICAS:\n" +
                "• ✅ Servidor HTTP de emails independiente\n" +
@@ -217,7 +217,7 @@ public class GmailMonitor {
                "Contenido: " + (originalContent.length() > 200 ? originalContent.substring(0, 200) + "..." : originalContent) + "\n\n" +
                "Si necesitas una respuesta personalizada, te contactaré pronto.\n\n" +
                "¡Saludos!\n" +
-               "Marco\n\n" +
+               "Jairo\n\n" +
                "---\n" +
                "🤖 Este es un mensaje automático generado por mi servidor HTTP personalizado.\n" +
                "📅 Fecha: " + new Date() + "\n" +

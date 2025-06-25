@@ -6,7 +6,7 @@ package postgresConecction;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

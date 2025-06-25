@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 /**
  * Servidor HTTP que recibe emails via POST y los envía a través de Gmail
  * Funciona con ngrok HTTP (gratuito)
- * @author MARCO
+ * @author Jairo
  */
 public class HTTPEmailServer {
     
@@ -184,7 +184,7 @@ public class HTTPEmailServer {
                 "            <input type=\"email\" name=\"from\" value=\"admin@mi-servidor.ngrok.io\" required>\n" +
                 "            \n" +
                 "            <label for=\"to\">To (destinatario):</label>\n" +
-                "            <input type=\"email\" name=\"to\" value=\"marcodavidtoledocanna@gmail.com\" required>\n" +
+                "            <input type=\"email\" name=\"to\" value=\"JairoJairoJairoJairo@gmail.com\" required>\n" +
                 "            \n" +
                 "            <label for=\"subject\">Subject:</label>\n" +
                 "            <input type=\"text\" name=\"subject\" value=\"Prueba desde mi servidor HTTP\" required>\n" +

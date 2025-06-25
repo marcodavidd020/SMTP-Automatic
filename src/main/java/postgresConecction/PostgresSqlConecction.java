@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class PostgresSqlConecction {
 

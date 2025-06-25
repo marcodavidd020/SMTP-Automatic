@@ -6,7 +6,7 @@ import java.io.IOException;
  * Servidor completo de email bidireccional:
  * - HTTP Server para enviar emails
  * - Gmail Monitor para recibir y responder automáticamente
- * @author MARCO
+ * @author Jairo
  */
 public class EmailServerComplete {
     
@@ -54,7 +54,7 @@ public class EmailServerComplete {
         
         System.out.println("✅ SERVIDOR COMPLETO INICIADO");
         System.out.println("📤 Envío de emails: http://localhost:8080");
-        System.out.println("📥 Monitoreo activo: marcodavidtoledo@gmail.com");
+        System.out.println("📥 Monitoreo activo: JairoJairoJairo@gmail.com");
         System.out.println("🌐 URL pública: https://340c-181-188-162-193.ngrok-free.app");
         System.out.println("═══════════════════════════════════════");
         
@@ -106,7 +106,7 @@ public class EmailServerComplete {
         System.out.println("📤 Servidor HTTP: " + (httpThread != null && httpThread.isAlive() ? "✅ ACTIVO" : "❌ INACTIVO"));
         System.out.println("📥 Monitor Gmail: " + (monitorThread != null && monitorThread.isAlive() ? "✅ ACTIVO" : "❌ INACTIVO"));
         System.out.println("🌐 URL pública: https://340c-181-188-162-193.ngrok-free.app");
-        System.out.println("📧 Email monitoreado: marcodavidtoledo@gmail.com");
+        System.out.println("📧 Email monitoreado: JairoJairoJairo@gmail.com");
         System.out.println("═══════════════════════════════════════\n");
     }
     

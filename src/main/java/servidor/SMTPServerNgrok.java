@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Servidor SMTP optimizado para ngrok - acceso desde cualquier lugar
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPServerNgrok {
 

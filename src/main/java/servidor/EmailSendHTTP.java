@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Cliente para enviar emails a través del servidor HTTP personalizado
- * @author MARCO
+ * @author Jairo
  */
 public class EmailSendHTTP {
     
@@ -92,8 +92,8 @@ public class EmailSendHTTP {
         
         // Test básico
         boolean success = sendEmail(
-            "marcodavidtoledo@gmail.com",
-            "marcodavidtoledocanna@gmail.com", 
+            "JairoJairoJairo@gmail.com",
+            "JairoJairoJairoJairo@gmail.com", 
             "Prueba desde EmailSendHTTP",
             "Este mensaje fue enviado usando la clase EmailSendHTTP que conecta con tu servidor personalizado a través de ngrok."
         );

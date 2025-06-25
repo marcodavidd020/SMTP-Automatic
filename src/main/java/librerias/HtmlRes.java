@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Generador de HTML mejorado para emails con CSS moderno
- * @author MARCO
+ * @author Jairo
  */
 public class HtmlRes {
     

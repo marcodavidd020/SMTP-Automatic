@@ -10,7 +10,7 @@ import librerias.Email;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public interface IEmailListener {
 

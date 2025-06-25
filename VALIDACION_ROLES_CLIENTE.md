@@ -162,5 +162,5 @@ No se encontró perfil de cliente o no tienes permisos. Contacta al administrado
 ---
 
 **Fecha de implementación**: $(date)  
-**Desarrollador**: Marco David Toledo  
+**Desarrollador**: Jairo Jairo Jairo  
 **Estado**: ✅ Validaciones de cliente implementadas 

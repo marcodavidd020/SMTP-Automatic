@@ -11,7 +11,7 @@ import librerias.analex.Token;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class ParamsAction extends EventObject {
     

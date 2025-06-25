@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 /**
  * Servidor SMTP personalizado que actúa como relay usando Gmail
  *
- * @author MARCO
+ * @author Jairo
  */
 public class SMTPServer {
 

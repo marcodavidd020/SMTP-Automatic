@@ -6,7 +6,7 @@ package librerias.analex;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class Analex {
     public static final char EOF = 0;   //fin de linea

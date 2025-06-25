@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 🚀 Script para iniciar servidor SMTP con ngrok
-# Autor: MARCO
+# Autor: Jairo
 
 echo "🚀 Iniciando servidor SMTP con ngrok..."
 echo "================================================"

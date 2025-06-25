@@ -13,7 +13,7 @@ public class TestEmailAuthentication {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         
         try {
-            String emailPrueba = "marcodavidtoledo@gmail.com";
+            String emailPrueba = "JairoJairoJairo@gmail.com";
             DUsuario dUsuario = new DUsuario();
             
             // Test 1: Verificar si el email está registrado
@@ -44,7 +44,7 @@ public class TestEmailAuthentication {
                 System.out.println("\n4. 📝 Simulando proceso de registro...");
                 try {
                     // Intentar registrar el usuario
-                    var resultadoRegistro = dUsuario.register("Marco", "Toledo", "123456789", "masculino", emailPrueba);
+                    var resultadoRegistro = dUsuario.register("Jairo", "Jairo", "123456789", "masculino", emailPrueba);
                     System.out.println("   ✅ Usuario registrado exitosamente");
                     System.out.println("   👤 Datos: " + String.join(", ", resultadoRegistro.get(0)));
                     

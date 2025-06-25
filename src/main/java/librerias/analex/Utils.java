@@ -6,7 +6,7 @@ package librerias.analex;
 
 /**
  *
- * @author MARCO
+ * @author Jairo
  */
 public class Utils {
     
