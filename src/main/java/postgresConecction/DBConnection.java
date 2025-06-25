@@ -1,7 +1,7 @@
 package postgresConecction;
 
 public class DBConnection {
-    // 🔧 CONFIGURACIÓN DE BASE DE DATOS LOCAL
+    // 🔧 CONFIGURACIÓN DE BASE DE DATOS - USANDO LOCAL TEMPORALMENTE (TECNOWEB SOBRECARGADO)
     public static String database = "EcommerceTool";
     public static String server = "127.0.0.1";
     public static String port = "5432";

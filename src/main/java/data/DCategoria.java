@@ -18,7 +18,7 @@ public class DCategoria {
     private final SqlConnection connection;
 
     public DCategoria() {
-        this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+        this.connection = new SqlConnection(DBConnectionManager.getDatabase(), DBConnectionManager.getServer(), DBConnectionManager.getPort(), DBConnectionManager.getUser(), DBConnectionManager.getPassword());
     }
     
     private DCategoria(SqlConnection customConnection) {

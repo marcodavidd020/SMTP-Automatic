@@ -24,7 +24,7 @@ public class GmailRelay {
     private static final boolean USE_SSL = true;
 
     // ⚠️ CAMBIAR ESTAS CREDENCIALES POR LAS TUYAS:
-    private static final String GMAIL_USERNAME = "JairoJairoJairo@gmail.com";
+    private static final String GMAIL_USERNAME = "marcodavidtoledo@gmail.com";
     private static final String GMAIL_APP_PASSWORD = "muknnpzrymdkduss"; // Contraseña de aplicación
 
     private final Session session;

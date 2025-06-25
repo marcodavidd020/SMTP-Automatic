@@ -142,17 +142,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 System.out.println("   💬 Responderá como REPLY al email original");
             }
 
-            // Verificar conexión antes de procesar usando configuración global
-            if (!testGlobalConnection()) {
-                System.err.println("   ❌ Error de conexión a base de datos " + 
-                    (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL"));
-                sendErrorEmailAsReply(senderEmail,
-                        "Error de conexión a la base de datos " + 
-                        (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
-                        ". Verifica la configuración de conexión.",
-                        originalSubject, messageId);
-                return;
-            }
+            // ✅ ELIMINAR TEST DE CONEXIÓN QUE AGOTA LOS SLOTS
+            // Ahora procesamos directamente usando métodos optimizados
 
             // Verificar si el comando es para registro (solo en subject)
             if (isRegistrationCommand(subject)) {
@@ -237,9 +228,9 @@ public class EmailAppIndependiente implements ICasoUsoListener {
      */
     private boolean isUserRegistered(String email) {
         try {
-            // ✅ USAR LA INSTANCIA GLOBAL QUE YA TIENE LA CONFIGURACIÓN CORRECTA
-            boolean registered = this.dUsuario.existsByEmail(email);
-            System.out.println("🔍 Verificación de usuario en BD " + 
+            // ✅ USAR VERSIÓN OPTIMIZADA PARA EVITAR PROBLEMAS DE CONEXIÓN
+            boolean registered = data.DUsuarioOptimizado.existsByEmail(email);
+            System.out.println("🔍 Verificación de usuario OPTIMIZADA en BD " + 
                 (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
                 ": " + email + " -> " + (registered ? "REGISTRADO" : "NO REGISTRADO"));
             return registered;
@@ -278,9 +269,9 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             String telefono = parts[3];
             String genero = parts[4];
 
-            // ✅ REGISTRAR USUARIO USANDO CONFIGURACIÓN GLOBAL
-            List<String[]> userData = this.dUsuario.register(nombre, apellido, telefono, genero, senderEmail);
-            System.out.println("✅ Usuario registrado en BD " + 
+            // ✅ REGISTRAR USUARIO CON ROL_ID = 2 USANDO VERSIÓN OPTIMIZADA
+            List<String[]> userData = data.DUsuarioOptimizado.registerWithRoleId2(nombre, apellido, telefono, genero, senderEmail);
+            System.out.println("✅ Usuario registrado con rol_id=2 en BD " + 
                 (DBConnectionManager.isTecnoweb() ? "TECNOWEB" : "LOCAL") + 
                 ": " + senderEmail);
 
@@ -378,6 +369,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 
                 // Comandos especiales que mantienen su lógica original
                 switch (entity) {
+                    case "help":
+                        // ✅ HELP: Procesar directamente sin ANALEX
+                        processHelpCommand(senderEmail, comando, originalSubject, messageId);
+                        return;
                     case "carrito":
                         String action = parts.length > 1 ? parts[1] : "get";
                         String param = parts.length > 2 ? parts[2] : null;
@@ -794,6 +789,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     @Override
     public void help(ParamsAction event) {
         try {
+            System.out.println("📖 Procesando comando HELP via ANALEX para: " + event.getSender());
+            
             String[] headers = { "Comando", "Disponible", "Descripción" };
             ArrayList<String[]> data = new ArrayList<>();
 
@@ -818,9 +815,16 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago" });
             data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
 
-            sendTableResponse(event.getSender(), "Comandos disponibles - Sistema E-commerce", headers, data,
-                    event.getCommand(), null, null);
+            // ✅ USAR MÉTODO DIRECTO PARA EVITAR PROBLEMAS CON ANALEX
+            String htmlContent = HtmlRes.generateTable("📖 Comandos Disponibles - Sistema E-commerce", headers, data);
+            emailRelay.sendEmail("servidor-independiente@localhost", event.getSender(), 
+                                "[Help] Comandos del Sistema", htmlContent);
+            
+            System.out.println("✅ Help enviado exitosamente a: " + event.getSender());
+            
         } catch (Exception ex) {
+            System.err.println("❌ Error procesando comando help: " + ex.getMessage());
+            ex.printStackTrace();
             handleError(CONSTRAINTS_ERROR, event.getSender(), Collections.singletonList("Error: " + ex.getMessage()),
                     null, null);
         }

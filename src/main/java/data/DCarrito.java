@@ -25,7 +25,7 @@ public class DCarrito {
 
     public DCarrito() {
         try {
-            this.connection = DriverManager.getConnection(DBConnection.url, DBConnection.user, DBConnection.password);
+            this.connection = DriverManager.getConnection(DBConnectionManager.getUrl(), DBConnectionManager.getUser(), DBConnectionManager.getPassword());
             this.connection.setAutoCommit(true);
             System.out.println("🗄️ DCarrito: Conexión establecida con autocommit habilitado");
         } catch (SQLException e) {

@@ -23,7 +23,7 @@ public class DVenta {
     
     public DVenta() {
         try {
-            this.connection = DriverManager.getConnection(DBConnection.url, DBConnection.user, DBConnection.password);
+            this.connection = DriverManager.getConnection(DBConnectionManager.getUrl(), DBConnectionManager.getUser(), DBConnectionManager.getPassword());
         } catch (SQLException e) {
             System.err.println("Error conectando a la base de datos en DVenta: " + e.getMessage());
         }

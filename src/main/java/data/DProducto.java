@@ -18,7 +18,7 @@ public class DProducto {
     private final SqlConnection connection;
 
     public DProducto() {
-        this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+        this.connection = new SqlConnection(DBConnectionManager.getDatabase(), DBConnectionManager.getServer(), DBConnectionManager.getPort(), DBConnectionManager.getUser(), DBConnectionManager.getPassword());
     }
     
     // Constructor privado para uso con configuración global

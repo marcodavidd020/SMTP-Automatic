@@ -17,9 +17,15 @@ public class DUsuario {
 
     private final SqlConnection connection;
 
-    // Constructor con configuración local (existente)
+    // Constructor con configuración global del manager
     public DUsuario() {
-        this.connection = new SqlConnection(DBConnection.database, DBConnection.server, DBConnection.port, DBConnection.user, DBConnection.password);
+        this.connection = new SqlConnection(
+            DBConnectionManager.getDatabase(), 
+            DBConnectionManager.getServer(), 
+            DBConnectionManager.getPort(), 
+            DBConnectionManager.getUser(), 
+            DBConnectionManager.getPassword()
+        );
     }
     
     // Constructor con configuración personalizada (NUEVO para Tecnoweb)
@@ -225,13 +231,11 @@ public class DUsuario {
                 }
             }
 
-            // ✅ 2. CREAR CLIENTE ASOCIADO (tabla 'cliente' de Laravel)
-            String clientQuery = "INSERT INTO cliente (user_id, nit, telefono, genero, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+            // ✅ 2. CREAR CLIENTE ASOCIADO (tabla 'cliente' de Laravel - solo NIT)
+            String clientQuery = "INSERT INTO cliente (user_id, nit, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
             try (PreparedStatement ps = conn.prepareStatement(clientQuery)) {
                 ps.setInt(1, userId);
                 ps.setString(2, "AUTO-" + userId); // NIT automático
-                ps.setString(3, telefono);
-                ps.setString(4, genero);
 
                 int clienteResult = ps.executeUpdate();
                 if (clienteResult > 0) {
@@ -241,40 +245,21 @@ public class DUsuario {
                 }
             }
 
-            // ✅ 3. ASIGNAR ROL DE CLIENTE (user_rol)
-            // Buscar ID del rol 'cliente'
-            String rolQuery = "SELECT id FROM rol WHERE nombre = 'cliente'";
-            int rolClienteId = 0;
-            try (PreparedStatement ps = conn.prepareStatement(rolQuery)) {
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    rolClienteId = rs.getInt(1);
+            // ✅ 3. ASIGNAR ROL DE CLIENTE (user_rol) - USAR ROL_ID = 2 DIRECTAMENTE
+            String userRolQuery = "INSERT INTO user_rol (user_id, rol_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
+            try (PreparedStatement ps = conn.prepareStatement(userRolQuery)) {
+                ps.setInt(1, userId);
+                ps.setInt(2, 2); // ✅ ROL_ID = 2 para cliente
+                
+                int userRolResult = ps.executeUpdate();
+                if (userRolResult > 0) {
+                    System.out.println("✅ Rol cliente (ID: 2) asignado al usuario ID: " + userId);
                 } else {
-                    System.out.println("⚠️ Rol 'cliente' no encontrado, creando...");
-                    // Crear rol cliente si no existe
-                    String createRolQuery = "INSERT INTO rol (nombre, created_at, updated_at) VALUES ('cliente', NOW(), NOW()) RETURNING id";
-                    try (PreparedStatement psCreate = conn.prepareStatement(createRolQuery)) {
-                        ResultSet rsCreate = psCreate.executeQuery();
-                        if (rsCreate.next()) {
-                            rolClienteId = rsCreate.getInt(1);
-                            System.out.println("✅ Rol 'cliente' creado con ID: " + rolClienteId);
-                        }
-                    }
+                    System.out.println("⚠️ No se pudo asignar rol cliente");
                 }
-            }
-
-            // Asignar rol al usuario
-            if (rolClienteId > 0) {
-                String userRolQuery = "INSERT INTO user_rol (user_id, rol_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
-                try (PreparedStatement ps = conn.prepareStatement(userRolQuery)) {
-                    ps.setInt(1, userId);
-                    ps.setInt(2, rolClienteId);
-                    
-                    int userRolResult = ps.executeUpdate();
-                    if (userRolResult > 0) {
-                        System.out.println("✅ Rol 'cliente' asignado al usuario ID: " + userId);
-                    }
-                }
+            } catch (SQLException roleEx) {
+                System.err.println("⚠️ Error asignando rol cliente: " + roleEx.getMessage());
+                // No fallar el registro por esto
             }
 
             conn.commit(); // Confirmar transacción

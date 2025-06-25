@@ -1,38 +1,79 @@
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NMicro.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\PostgresSqlConecction.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\Servidor.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NPuntos.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NRutas.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\com\mycompany\parcial1\tecnoweb\EmailApp.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DPermiso.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\analex\Token.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\analex\TSParams.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\Email.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NRolPermisos.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\EmailReceipt.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DRolPermiso.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\EmailSend.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\SqlConnection.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DPersona.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\analex\Analex.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\interfaces\ICasoUsoListener.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\Instruccion.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DMicro.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DPuntos.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DRutas.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\ParamsAction.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\ClientePOP.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DChofer.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\interfaces\IEmailListener.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\analex\Utils.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\Interpreter.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NChofer.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\com\mycompany\parcial1\tecnoweb\pruebas.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\com\mycompany\parcial1\tecnoweb\run.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NPersona.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\analex\Cinta.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\librerias\HtmlRes.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DRol.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\data\DNotificacion.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\negocio\NNotificacion.java
-D:\Todo\Materias Universidad\Tecnologia Web\2022-2_INF513-SC_grupo017SC\parcial1.TecnoWeb\src\main\java\postgresConecction\ClienteSMTP.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/com/mycompany/parcial1/tecnoweb/EmailAppIndependiente.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/com/mycompany/parcial1/tecnoweb/EmailAppTecnoweb.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/com/mycompany/parcial1/tecnoweb/LanzadorPrincipal.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DCarrito.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DCategoria.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DCliente.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DPago.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DPatrocinador.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DPatrocinio.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DProducto.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DProveedor.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DRol.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DServicio.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DTipoPago.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DUserRol.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DUsuario.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DUsuarioOptimizado.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/data/DVenta.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/interfaces/ICasoUsoListener.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/interfaces/IEmailListener.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/Email.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/HtmlRes.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/Instruccion.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/Interpreter.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/ParamsAction.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Analex.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Cinta.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/TSParams.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Token.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/librerias/analex/Utils.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPago.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPatrocinador.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NPatrocinio.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NProveedor.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NRol.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NServicio.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NUserRol.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/negocio/NUsuario.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/ClientePOP.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/ClienteSMTP.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/DBConnection.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/DBConnectionManager.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/EmailReceipt.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/EmailSend.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/EmailSendNgrok.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/PostgresSqlConecction.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/Servidor.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/SqlConnection.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/postgresConecction/TestConnection.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/EmailSendHTTP.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/EmailServerComplete.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailMonitor.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailMonitorComandos.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailMonitorCompleto.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailMonitorRecientes.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailRelay.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/GmailRelayHTML.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/HTTPEmailServer.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPClient.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPClientHandler.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPClientHandlerNgrok.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPClientNgrok.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPServer.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/SMTPServerNgrok.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/TestGmail.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/servidor/TestIMAP.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestAnalex.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestCategorias.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestComandoUsuario.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestDirectSQL.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestEmailAuthentication.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestFixUser.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestHtmlMejorado.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestRealStructure.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestSimpleAuth.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestSistemaCompleto.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestTecnowebAuth.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestTecnowebTables.java
+/mnt/Local/Todo/Jairo/Tecno (1-2025)/tecno-mail/src/main/java/test/TestTodosComandos.java
