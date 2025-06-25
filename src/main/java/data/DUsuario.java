@@ -63,13 +63,15 @@ public class DUsuario {
     }
 
     public List<String[]> save(String nombre, String apellido, String telefono, String genero, String email, String password, int rol_id) throws SQLException {
-        // Por ahora solo insertar en users básico
-        String query = "INSERT INTO user (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
+        // ✅ INTEGRACIÓN CON LARAVEL: Usar tabla 'user' (singular) siguiendo migraciones Laravel
+        String query = "INSERT INTO user (nombre, celular, email, genero, password, estado, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'activo', NOW(), NOW()) RETURNING id";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, nombre + " " + apellido);
-            ps.setString(2, email);
-            ps.setString(3, password);
+            ps.setString(1, nombre + " " + apellido);  // Laravel usa campo 'nombre' completo
+            ps.setString(2, telefono);                // Laravel usa 'celular' 
+            ps.setString(3, email);
+            ps.setString(4, genero);                  // Laravel: enum('masculino', 'femenino', 'otro')
+            ps.setString(5, password);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -82,12 +84,14 @@ public class DUsuario {
     }
 
     public List<String[]> update(int id, String nombre, String apellido, String telefono, String genero, String email) throws SQLException {
-        String query = "UPDATE users SET nombre = ?, email = ?, updated_at = NOW() WHERE id = ?";
+        String query = "UPDATE user SET nombre = ?, celular = ?, email = ?, genero = ?, updated_at = NOW() WHERE id = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, nombre + " " + apellido);
-            ps.setString(2, email);
-            ps.setInt(3, id);
+            ps.setString(2, telefono);
+            ps.setString(3, email);
+            ps.setString(4, genero);
+            ps.setInt(5, id);
 
             if(ps.executeUpdate() == 0) {
                 System.err.println("Error al modificar el usuario");
@@ -98,7 +102,7 @@ public class DUsuario {
     }
 
     public List<String[]> delete(int id) throws SQLException {
-        String query = "DELETE FROM users WHERE id = ?";
+        String query = "DELETE FROM user WHERE id = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -112,7 +116,7 @@ public class DUsuario {
 
     public List<String[]> list() throws SQLException {
         List<String[]> usuarios = new ArrayList<>();
-        String query = "SELECT * FROM users ORDER BY id";
+        String query = "SELECT * FROM user ORDER BY id";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ResultSet set = ps.executeQuery();
@@ -141,7 +145,7 @@ public class DUsuario {
      * Verifica si un usuario existe por email
      */
     public boolean existsByEmail(String email) throws SQLException {
-        String query = "SELECT COUNT(*) FROM users WHERE email = ?";
+        String query = "SELECT COUNT(*) FROM user WHERE email = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);
@@ -161,7 +165,7 @@ public class DUsuario {
      */
     public List<String[]> getByEmail(String email) throws SQLException {
         List<String[]> usuario = new ArrayList<>();
-        String query = "SELECT * FROM users WHERE email = ?";
+        String query = "SELECT * FROM user WHERE email = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, email);
@@ -184,7 +188,9 @@ public class DUsuario {
     }
 
     /**
+     * ✅ REGISTRO COMPLETO PARA LARAVEL: usuario + cliente + rol
      * Registra un nuevo usuario y crea automáticamente un cliente asociado
+     * siguiendo la estructura de migraciones de Laravel
      */
     public List<String[]> register(String nombre, String apellido, String telefono, String genero, String email) throws SQLException {
         // Verificar si el email ya existe
@@ -200,13 +206,15 @@ public class DUsuario {
             conn = connection.connect();
             conn.setAutoCommit(false); // Iniciar transacción
 
-            // 1. Crear usuario
-            String userQuery = "INSERT INTO users (nombre, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
+            // ✅ 1. CREAR USUARIO (tabla 'user' de Laravel)
+            String userQuery = "INSERT INTO user (nombre, celular, email, genero, password, estado, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'activo', NOW(), NOW()) RETURNING id";
             int userId;
             try (PreparedStatement ps = conn.prepareStatement(userQuery)) {
                 ps.setString(1, fullName);
-                ps.setString(2, email);
-                ps.setString(3, defaultPassword);
+                ps.setString(2, telefono);    // Laravel usa 'celular'
+                ps.setString(3, email);
+                ps.setString(4, genero);      // Laravel: enum('masculino', 'femenino', 'otro')
+                ps.setString(5, defaultPassword);
 
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -217,8 +225,8 @@ public class DUsuario {
                 }
             }
 
-            // 2. Crear cliente asociado
-            String clientQuery = "INSERT INTO clientes (user_id, nit, created_at, updated_at, telefono, genero) VALUES (?, ?, NOW(), NOW(), ?, ?)";
+            // ✅ 2. CREAR CLIENTE ASOCIADO (tabla 'cliente' de Laravel)
+            String clientQuery = "INSERT INTO cliente (user_id, nit, telefono, genero, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
             try (PreparedStatement ps = conn.prepareStatement(clientQuery)) {
                 ps.setInt(1, userId);
                 ps.setString(2, "AUTO-" + userId); // NIT automático
@@ -230,6 +238,42 @@ public class DUsuario {
                     System.out.println("✅ Cliente creado automáticamente para usuario ID: " + userId);
                 } else {
                     throw new SQLException("Error al crear cliente asociado.");
+                }
+            }
+
+            // ✅ 3. ASIGNAR ROL DE CLIENTE (user_rol)
+            // Buscar ID del rol 'cliente'
+            String rolQuery = "SELECT id FROM rol WHERE nombre = 'cliente'";
+            int rolClienteId = 0;
+            try (PreparedStatement ps = conn.prepareStatement(rolQuery)) {
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    rolClienteId = rs.getInt(1);
+                } else {
+                    System.out.println("⚠️ Rol 'cliente' no encontrado, creando...");
+                    // Crear rol cliente si no existe
+                    String createRolQuery = "INSERT INTO rol (nombre, created_at, updated_at) VALUES ('cliente', NOW(), NOW()) RETURNING id";
+                    try (PreparedStatement psCreate = conn.prepareStatement(createRolQuery)) {
+                        ResultSet rsCreate = psCreate.executeQuery();
+                        if (rsCreate.next()) {
+                            rolClienteId = rsCreate.getInt(1);
+                            System.out.println("✅ Rol 'cliente' creado con ID: " + rolClienteId);
+                        }
+                    }
+                }
+            }
+
+            // Asignar rol al usuario
+            if (rolClienteId > 0) {
+                String userRolQuery = "INSERT INTO user_rol (user_id, rol_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
+                try (PreparedStatement ps = conn.prepareStatement(userRolQuery)) {
+                    ps.setInt(1, userId);
+                    ps.setInt(2, rolClienteId);
+                    
+                    int userRolResult = ps.executeUpdate();
+                    if (userRolResult > 0) {
+                        System.out.println("✅ Rol 'cliente' asignado al usuario ID: " + userId);
+                    }
                 }
             }
 
@@ -264,9 +308,10 @@ public class DUsuario {
      */
     public List<String[]> getByEmailWithRole(String email) throws SQLException {
         List<String[]> usuario = new ArrayList<>();
-        String query = "SELECT u.id, u.nombre, u.email, u.rol_id, r.nombre as rol_nombre " +
-                      "FROM usuarios u " +
-                      "LEFT JOIN roles r ON u.rol_id = r.id " +
+        String query = "SELECT u.id, u.nombre, u.email, r.id as rol_id, r.nombre as rol_nombre " +
+                      "FROM user u " +
+                      "LEFT JOIN user_rol ur ON u.id = ur.user_id " +
+                      "LEFT JOIN rol r ON ur.rol_id = r.id " +
                       "WHERE u.email = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -295,8 +340,9 @@ public class DUsuario {
      */
     public boolean tieneRol(String email, String nombreRol) throws SQLException {
         String query = "SELECT COUNT(*) " +
-                      "FROM usuarios u " +
-                      "JOIN roles r ON u.rol_id = r.id " +
+                      "FROM user u " +
+                      "JOIN user_rol ur ON u.id = ur.user_id " +
+                      "JOIN rol r ON ur.rol_id = r.id " +
                       "WHERE u.email = ? AND r.nombre = ?";
         try (Connection conn = connection.connect();
              PreparedStatement ps = conn.prepareStatement(query)) {
