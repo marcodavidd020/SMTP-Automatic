@@ -339,7 +339,8 @@ public class GmailMonitorCompleto {
     private boolean isValidCommand(String action) {
         return action.equals("usuario") || action.equals("producto") || 
                action.equals("categoria") || action.equals("cliente") || 
-               action.equals("tipo_pago") || action.equals("help");
+               action.equals("tipo_pago") || action.equals("pedido") || 
+               action.equals("help");
     }
     
     /**
@@ -356,7 +357,9 @@ public class GmailMonitorCompleto {
         error += "• `producto get` - Lista todos los productos\n";
         error += "• `categoria get` - Lista todas las categorías\n";
         error += "• `cliente get` - Lista todos los clientes\n";
-        error += "• `tipo_pago get` - Lista tipos de pago\n\n";
+        error += "• `tipo_pago get` - Lista tipos de pago\n";
+        error += "• `pedido get` - Lista todos los pedidos\n";
+        error += "• `pedido add URL_MAPS referencia` - Crear pedido con dirección\n\n";
         error += "❓ **Ayuda:**\n";
         error += "• `help` - Ver ayuda completa\n\n";
         error += "💡 **¿Quisiste decir?**\n";
@@ -370,6 +373,9 @@ public class GmailMonitorCompleto {
         }
         if (comando.contains("product")) {
             error += "• `producto get` (en lugar de product)\n";
+        }
+        if (comando.contains("order")) {
+            error += "• `pedido get` (en lugar de order)\n";
         }
         if (comando.contains("ayuda")) {
             error += "• `help` (en lugar de ayuda)\n";

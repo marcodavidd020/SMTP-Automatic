@@ -1,24 +1,36 @@
 package com.mycompany.parcial1.tecnoweb;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import data.DCarrito;
 import data.DCategoria;
 import data.DCliente;
+import data.DPedido;
 import data.DProducto;
 import data.DTipoPago;
 import data.DUsuario;
 import data.DVenta;
+import data.DDireccion;
 import interfaces.ICasoUsoListener;
-import librerias.HtmlRes;
 import librerias.ParamsAction;
+import librerias.HtmlRes;
 import librerias.analex.Token;
-import negocio.NUsuario;
 import negocio.NCarrito;
 import negocio.NCategoria;
+import negocio.NUsuario;
 import postgresConecction.DBConnection;
 import postgresConecction.DBConnectionManager;
 import postgresConecction.TestConnection;
@@ -38,6 +50,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private static final int PARSE_ERROR = -5;
     private static final int AUTHORIZATION_ERROR = -6;
     private static final int DATABASE_ERROR = -7;
+
+    // Configuración del sistema de email
+    private static final String SYSTEM_EMAIL = "JairoJairoJairo@gmail.com";
+    private static final String SYSTEM_PASSWORD = "wcnksgxypzyqfbqp";
 
     private GmailRelay emailRelay;
     private NUsuario nUsuario;
@@ -418,6 +434,12 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         String pagoParam = parts.length > 2 ? parts[2] : null;
                         processPagoCommand(senderEmail, pagoAction, pagoParam, comando, originalSubject, messageId);
                         return;
+                    case "pedido":
+                        // 🛠️ Procesamiento directo para pedido (problema con ANALEX)
+                        String pedidoAction = parts.length > 1 ? parts[1] : "get";
+                        String pedidoParam = parts.length > 2 ? parts[2] : null;
+                        processPedidoCommand(senderEmail, pedidoAction, pedidoParam, comando, originalSubject, messageId);
+                        return;
                     case "ventas":
                     case "compras":
                         String ventasAction = parts.length > 1 ? parts[1] : "get";
@@ -477,6 +499,9 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                     break;
                 case "tipo_pago":
                     processTipoPagoCommand(senderEmail, action, param, comando, originalSubject, messageId);
+                    break;
+                case "pedido":
+                    processPedidoCommand(senderEmail, action, param, comando, originalSubject, messageId);
                     break;
                 case "help":
                     processHelpCommand(senderEmail, comando, originalSubject, messageId);
@@ -605,6 +630,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "checkout", "✅ SÍ", "Crear orden de compra" });
             data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago" });
             data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
+            data.add(new String[] { "pedido get", "✅ SÍ", "Ver todos los pedidos" });
+            data.add(new String[] { "pedido get <id>", "✅ SÍ", "Ver pedido específico" });
+            data.add(new String[] { "pedido add <direccion_id>", "✅ SÍ", "Crear pedido desde el carrito (con ID de dirección)" });
+            data.add(new String[] { "pedido add <url_maps> <referencia>", "✅ SÍ", "Crear pedido con nueva dirección" });
 
             sendTableResponse(senderEmail, "Comandos disponibles - Sistema E-commerce", headers, data, comando,
                     originalSubject, messageId);
@@ -708,7 +737,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                 subjectLower.startsWith("ventas ") ||
                 subjectLower.startsWith("compras ") ||
                 subjectLower.equals("ventas get") ||
-                subjectLower.equals("compras get");
+                subjectLower.equals("compras get") ||
+                // 🆕 Comandos del sistema de pedidos
+                subjectLower.startsWith("pedido ") ||
+                subjectLower.equals("pedido get");
     }
 
     // Implementación de la interfaz ICasoUsoListener (métodos requeridos)
@@ -846,6 +878,10 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             data.add(new String[] { "checkout", "✅ SÍ", "Crear orden de compra" });
             data.add(new String[] { "pago [venta_id] [tipo_pago_id]", "✅ SÍ", "Completar pago" });
             data.add(new String[] { "ventas get", "✅ SÍ", "Ver historial de compras" });
+            data.add(new String[] { "pedido get", "✅ SÍ", "Ver todos los pedidos" });
+            data.add(new String[] { "pedido get <id>", "✅ SÍ", "Ver pedido específico" });
+            data.add(new String[] { "pedido add <direccion_id>", "✅ SÍ", "Crear pedido desde el carrito (con ID de dirección)" });
+            data.add(new String[] { "pedido add <url_maps> <referencia>", "✅ SÍ", "Crear pedido con nueva dirección" });
 
             // ✅ USAR MÉTODO DIRECTO PARA EVITAR PROBLEMAS CON ANALEX
             String htmlContent = HtmlRes.generateTable("📖 Comandos Disponibles - Sistema E-commerce", headers, data);
@@ -1492,6 +1528,193 @@ public class EmailAppIndependiente implements ICasoUsoListener {
         } catch (Exception e) {
             System.err.println("❌ Error en búsqueda segura de cliente: " + e.getMessage());
             return 0;
+        }
+    }
+
+    /**
+     * Procesa comandos relacionados con pedidos
+     */
+    private void processPedidoCommand(String senderEmail, String action, String param, String comando,
+            String originalSubject, String messageId) {
+        try {
+            int clienteId = obtenerClienteIdPorEmailSeguro(senderEmail);
+            if (clienteId == 0) {
+                sendSimpleResponse(senderEmail, "❌ Error",
+                        "No se encontró perfil de cliente o no tienes permisos. Contacta al administrador.", 
+                        originalSubject, messageId);
+                return;
+            }
+            
+            // Crear instancia de DPedido
+            DPedido dPedido = new DPedido();
+            
+            switch (action) {
+                case "get":
+                    if (param != null) {
+                        try {
+                            // Obtener pedido específico
+                            int pedidoId = Integer.parseInt(param);
+                            List<String[]> pedido = dPedido.get(pedidoId);
+                            
+                            if (pedido != null && !pedido.isEmpty()) {
+                                String htmlContent = HtmlRes.generateTable(
+                                        "Detalles del Pedido #" + pedidoId,
+                                        DPedido.HEADERS,
+                                        pedido);
+                                
+                                sendSimpleResponse(senderEmail, "📦 Detalles del Pedido #" + pedidoId, 
+                                        "Pedido #" + pedidoId + " encontrado. Revisa los detalles a continuación.", 
+                                        originalSubject, messageId);
+                            } else {
+                                sendSimpleResponse(senderEmail, "❌ Pedido no encontrado", 
+                                        "No se encontró el pedido con ID: " + pedidoId, 
+                                        originalSubject, messageId);
+                            }
+                        } catch (NumberFormatException e) {
+                            sendSimpleResponse(senderEmail, "❌ ID inválido", 
+                                    "El ID del pedido debe ser un número. Formato: pedido get [id]", 
+                                    originalSubject, messageId);
+                        }
+                    } else {
+                        // Listar todos los pedidos
+                        List<String[]> pedidos = dPedido.list();
+                        
+                        if (pedidos != null && !pedidos.isEmpty()) {
+                            String htmlContent = HtmlRes.generateTable(
+                                    "Lista de Pedidos",
+                                    DPedido.HEADERS,
+                                    pedidos);
+                            
+                            sendSimpleResponse(senderEmail, "📦 Lista de Pedidos", 
+                                    "Se encontraron " + pedidos.size() + " pedidos en el sistema.", 
+                                    originalSubject, messageId);
+                        } else {
+                            sendSimpleResponse(senderEmail, "📦 Sin pedidos", 
+                                    "No hay pedidos registrados en el sistema.", 
+                                    originalSubject, messageId);
+                        }
+                    }
+                    break;
+                
+                case "add":
+                    if (param != null) {
+                        try {
+                            // Verificar si es un ID numérico o una URL de Google Maps
+                            boolean esNumero = true;
+                            int direccionId = 0;
+                            
+                            try {
+                                // Intentar parsear como número
+                                direccionId = Integer.parseInt(param);
+                            } catch (NumberFormatException e) {
+                                esNumero = false;
+                            }
+                            
+                            // Si no es un número, intentar procesar como URL de Google Maps
+                            if (!esNumero) {
+                                try {
+                                    // El comando completo tiene el formato: "pedido add URL referencia"
+                                    // param ya contiene la URL (primera palabra después de "add")
+                                    String urlGoogleMaps = param;
+                                    
+                                    // La referencia es todo lo que viene después de la URL
+                                    String referencia = "Sin referencia";
+                                    String[] partesDespuesDeAdd = comando.split("\\s+", 3);
+                                    if (partesDespuesDeAdd.length >= 3) {
+                                        // Obtener todo después de "pedido add URL"
+                                        String[] partesURL = partesDespuesDeAdd[2].split("\\s+", 2);
+                                        if (partesURL.length >= 2) {
+                                            referencia = partesURL[1];
+                                        }
+                                    }
+                                    
+                                    System.out.println("   🗺️ URL de Google Maps: " + urlGoogleMaps);
+                                    System.out.println("   📝 Referencia: " + referencia);
+                                    
+                                    // Crear dirección con la URL
+                                    DDireccion dDireccion = new DDireccion();
+                                    direccionId = dDireccion.add("Dirección de " + senderEmail, urlGoogleMaps, referencia);
+                                    
+                                    if (direccionId <= 0) {
+                                        sendSimpleResponse(senderEmail, "❌ Error en la dirección", 
+                                                "No se pudo crear la dirección con la URL proporcionada. Verifica que sea un enlace válido de Google Maps.",
+                                                originalSubject, messageId);
+                                        return;
+                                    }
+                                    
+                                    System.out.println("   ✅ Dirección creada con ID: " + direccionId);
+                                } catch (Exception e) {
+                                    System.err.println("❌ Error procesando URL de Google Maps: " + e.getMessage());
+                                    sendSimpleResponse(senderEmail, "❌ Error en la dirección", 
+                                            "No se pudo procesar la URL de Google Maps: " + e.getMessage() + "\n\n" +
+                                            "El formato correcto es: pedido add URL_GOOGLE_MAPS referencia\n" +
+                                            "Ejemplo: pedido add https://www.google.com/maps/@-17.78,63.18,15z Mi Casa",
+                                            originalSubject, messageId);
+                                    return;
+                                }
+                            }
+                            
+                            // Verificar carrito
+                            DCarrito dCarrito = new DCarrito();
+                            List<String[]> carrito = dCarrito.obtenerCarrito(clienteId);
+                            
+                            if (carrito == null || carrito.isEmpty()) {
+                                sendSimpleResponse(senderEmail, "❌ Carrito vacío", 
+                                        "Tu carrito está vacío. Agrega productos antes de crear un pedido.",
+                                        originalSubject, messageId);
+                                return;
+                            }
+                            
+                            // Crear pedido desde carrito
+                            int pedidoId = dPedido.crearPedidoDesdeCarrito(clienteId, direccionId);
+                            
+                            if (pedidoId > 0) {
+                                sendSimpleResponse(senderEmail, "✅ Pedido Creado", 
+                                        String.format("¡Tu pedido #%d ha sido creado exitosamente!\n\n" +
+                                                     "Para completar el proceso de compra, usa el comando:\n" +
+                                                     "• pago [venta_id] [tipo_pago_id]\n\n" +
+                                                     "Puedes ver los tipos de pago disponibles con:\n" +
+                                                     "• tipo_pago get", pedidoId),
+                                        originalSubject, messageId);
+                            } else {
+                                sendSimpleResponse(senderEmail, "❌ Error", 
+                                        "No se pudo crear el pedido. Verifica que tu carrito tenga productos válidos.",
+                                        originalSubject, messageId);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("❌ Error en pedido add: " + e.getMessage());
+                            e.printStackTrace();
+                            sendSimpleResponse(senderEmail, "❌ Error", 
+                                    "Error procesando el comando: " + e.getMessage() + "\n\n" +
+                                    "Formatos válidos:\n" +
+                                    "• pedido add [direccion_id] - Usar ID de dirección existente\n" +
+                                    "• pedido add [URL_GOOGLE_MAPS] [referencia] - Crear nueva dirección",
+                                    originalSubject, messageId);
+                        }
+                    } else {
+                        sendSimpleResponse(senderEmail, "❌ Parámetro requerido", 
+                                "Se requiere el ID de la dirección o una URL de Google Maps.\n\n" +
+                                "Formatos válidos:\n" +
+                                "• pedido add [direccion_id] - Usar ID de dirección existente\n" +
+                                "• pedido add [URL_GOOGLE_MAPS] [referencia] - Crear nueva dirección",
+                                originalSubject, messageId);
+                    }
+                    break;
+                
+                default:
+                    sendSimpleResponse(senderEmail, "❌ Acción no implementada", 
+                            String.format("La acción '%s' no está implementada para pedidos.\n\n" +
+                                         "ACCIONES DISPONIBLES:\n" +
+                                         "• pedido get - Ver todos los pedidos\n" +
+                                         "• pedido get [id] - Ver pedido específico\n" +
+                                         "• pedido add [direccion_id] - Crear pedido desde carrito", action),
+                                originalSubject, messageId);
+                    break;
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error en processPedidoCommand: " + e.getMessage());
+            e.printStackTrace();
+            sendErrorEmail(senderEmail, "Error procesando comando: " + e.getMessage(), originalSubject, messageId);
         }
     }
 

@@ -19,7 +19,7 @@ import postgresConecction.DBConnectionManager;
 public class DCarrito {
 
     public static final String[] HEADERS = { "ID", "Cliente ID", "Fecha", "Total", "Estado" };
-    public static final String[] DETALLE_HEADERS = { "Producto", "Cantidad", "Precio Unit.", "Subtotal" };
+    public static final String[] DETALLE_HEADERS = { "Producto", "Cantidad", "Precio", "Subtotal", "ID" };
 
     private Connection connection;
 
@@ -176,7 +176,8 @@ public class DCarrito {
                         rs.getString("nombre"),
                         String.valueOf(rs.getInt("cantidad")),
                         String.format("$%.2f", rs.getDouble("precio_venta")),
-                        String.format("$%.2f", rs.getDouble("subtotal"))
+                        String.format("$%.2f", rs.getDouble("subtotal")),
+                        String.valueOf(rs.getInt("producto_id"))
                 });
             }
         }
@@ -255,7 +256,7 @@ public class DCarrito {
     // Métodos auxiliares
 
     private boolean verificarStock(int productoId, int cantidadSolicitada) throws SQLException {
-        String sql = "SELECT \"stock\" FROM \"producto_inventario\" WHERE \"producto_id\" = ?";
+        String sql = "SELECT \"stock\" FROM \"producto_inventario\" WHERE \"producto_id\" = ? AND \"almacen_id\" = 4";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, productoId);
             ResultSet rs = stmt.executeQuery();
@@ -325,5 +326,28 @@ public class DCarrito {
             }
         }
         return 0;
+    }
+
+    /**
+     * Vincula el carrito del cliente a un pedido
+     */
+    public boolean vincularCarritoAPedido(int clienteId, int pedidoId) throws SQLException {
+        String sql = "UPDATE \"carrito\" SET \"pedido_id\" = ? WHERE \"cliente_id\" = ? AND \"estado\" = 'activo'";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, pedidoId);
+            stmt.setInt(2, clienteId);
+            
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                System.out.println("✅ Carrito vinculado al pedido " + pedidoId);
+                return true;
+            } else {
+                System.err.println("❌ No se encontró carrito activo para cliente " + clienteId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error vinculando carrito a pedido: " + e.getMessage());
+            throw e;
+        }
     }
 }

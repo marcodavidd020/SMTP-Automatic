@@ -374,6 +374,7 @@ public class GmailMonitorComandos {
                 lineLower.equals("carrito clear") ||
                 lineLower.equals("checkout") ||
                 lineLower.equals("ventas get") ||
+                lineLower.equals("pedido get") ||
                 lineLower.equals("pago get")) {
             return true;
         }
@@ -389,6 +390,7 @@ public class GmailMonitorComandos {
                 lineLower.startsWith("carrito add ") ||
                 lineLower.startsWith("carrito remove ") ||
                 lineLower.startsWith("ventas get ") ||
+                lineLower.startsWith("pedido ") ||
                 lineLower.startsWith("pago ")) {
             return true;
         }
@@ -425,6 +427,8 @@ public class GmailMonitorComandos {
                 subjectLower.equals("checkout") ||
                 subjectLower.startsWith("ventas ") ||
                 subjectLower.equals("ventas get") ||
+                subjectLower.startsWith("pedido ") ||
+                subjectLower.equals("pedido get") ||
                 subjectLower.startsWith("pago ");
     }
 
@@ -464,6 +468,8 @@ public class GmailMonitorComandos {
                 subjectLower.equals("checkout") ||
                 subjectLower.startsWith("ventas ") ||
                 subjectLower.equals("ventas get") ||
+                subjectLower.startsWith("pedido ") ||
+                subjectLower.equals("pedido get") ||
                 subjectLower.startsWith("pago ");
     }
 

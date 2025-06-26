@@ -342,4 +342,29 @@ public class DVenta {
             System.out.println("📦 Stock actualizado para " + affected + " productos");
         }
     }
+
+    /**
+     * Crea una nota de venta vinculada a un pedido
+     */
+    public int crearNotaVentaDesdePedido(int pedidoId, double total) throws SQLException {
+        String sql = "INSERT INTO \"nota_venta\" (\"fecha\", \"total\", \"estado\", \"pedido_id\") VALUES (CURRENT_DATE, ?, 'pendiente', ?) RETURNING \"id\"";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDouble(1, total);
+            stmt.setInt(2, pedidoId);
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int notaVentaId = rs.getInt("id");
+                System.out.println("✅ Nota de venta creada con ID: " + notaVentaId);
+                System.out.println("   📦 Vinculada al pedido: " + pedidoId);
+                System.out.println("   💰 Total: $" + total);
+                return notaVentaId;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error creando nota de venta: " + e.getMessage());
+            throw e;
+        }
+        return -1;
+    }
 } 
