@@ -323,4 +323,93 @@ public class DPedido {
             return false;
         }
     }
+
+    /**
+     * Obtiene los detalles de productos de un pedido específico
+     */
+    public List<String[]> getDetallePedido(int pedidoId) {
+        List<String[]> result = new ArrayList<>();
+        String sql = """
+                SELECT p.nombre, dc.cantidad, p.precio_venta, dc.subtotal, p.id as producto_id
+                FROM pedido pe
+                JOIN carrito c ON c.pedido_id = pe.id
+                JOIN detalle_carrito dc ON dc.carrito_id = c.id
+                JOIN producto p ON p.id = dc.producto_id
+                WHERE pe.id = ?
+                ORDER BY p.nombre
+                """;
+        
+        try (Connection conn = connection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, pedidoId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String[] row = {
+                    rs.getString("nombre"),
+                    String.valueOf(rs.getInt("cantidad")),
+                    String.format("$%.2f", rs.getDouble("precio_venta")),
+                    String.format("$%.2f", rs.getDouble("subtotal")),
+                    String.valueOf(rs.getInt("producto_id"))
+                };
+                result.add(row);
+            }
+            
+            if (result.isEmpty()) {
+                System.out.println("⚠️ No se encontraron detalles para el pedido ID: " + pedidoId);
+            } else {
+                System.out.println("✅ Detalles de pedido obtenidos: " + result.size() + " productos");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error obteniendo detalles del pedido: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Lista pedidos de un cliente específico a través de su carrito
+     */
+    public List<String[]> listByCliente(int clienteId) {
+        List<String[]> result = new ArrayList<>();
+        String sql = """
+                SELECT DISTINCT p.id, p.direccion_id, p.fecha, p.total, p.estado, 
+                       p.fecha_hora_envio, p.fecha_hora_entrega
+                FROM pedido p
+                JOIN carrito c ON c.pedido_id = p.id
+                WHERE c.cliente_id = ?
+                ORDER BY p.fecha DESC
+                """;
+        
+        try (Connection conn = connection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, clienteId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String[] row = {
+                    rs.getString("id"),
+                    rs.getString("direccion_id"),
+                    rs.getString("fecha"),
+                    String.format("$%.2f", rs.getDouble("total")),
+                    rs.getString("estado"),
+                    rs.getString("fecha_hora_envio") != null ? rs.getString("fecha_hora_envio") : "Pendiente",
+                    rs.getString("fecha_hora_entrega") != null ? rs.getString("fecha_hora_entrega") : "Pendiente"
+                };
+                result.add(row);
+            }
+            
+            if (result.isEmpty()) {
+                System.out.println("⚠️ No se encontraron pedidos para el cliente ID: " + clienteId);
+            } else {
+                System.out.println("✅ Pedidos del cliente obtenidos: " + result.size() + " pedidos");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error listando pedidos del cliente: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public static final String[] DETALLE_HEADERS = {"Producto", "Cantidad", "Precio", "Subtotal", "ID"};
 } 

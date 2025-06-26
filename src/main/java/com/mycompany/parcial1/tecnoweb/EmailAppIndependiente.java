@@ -19,6 +19,7 @@ import data.DCarrito;
 import data.DCategoria;
 import data.DCliente;
 import data.DPedido;
+import negocio.NPedido;
 import data.DProducto;
 import data.DTipoPago;
 import data.DUsuario;
@@ -64,6 +65,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
     private DTipoPago dTipoPago;
     private NCarrito nCarrito;
     private DVenta dVenta;
+    private DPedido dPedido;
+    private NPedido nPedido;
 
     public EmailAppIndependiente() {
         this(false); // Por defecto usar configuración local
@@ -89,6 +92,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             this.dTipoPago = DTipoPago.createWithGlobalConfig();
             this.nCarrito = new NCarrito();      // Usa configuración global internamente
             this.dVenta = DVenta.createWithGlobalConfig();
+            this.dPedido = DPedido.createWithGlobalConfig();
+            this.nPedido = new NPedido();
             
             System.out.println("✅ TODAS las clases principales configuradas para usar BD TECNOWEB");
         } else {
@@ -99,6 +104,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
             this.dTipoPago = new DTipoPago();
             this.nCarrito = new NCarrito();      // Usa configuración local por defecto
             this.dVenta = new DVenta();
+            this.dPedido = new DPedido();
+            this.nPedido = new NPedido();
             
             System.out.println("✅ TODAS las clases principales configuradas para usar BD LOCAL");
         }
@@ -1554,17 +1561,35 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                         try {
                             // Obtener pedido específico
                             int pedidoId = Integer.parseInt(param);
-                            List<String[]> pedido = dPedido.get(pedidoId);
+                            List<String[]> pedido = nPedido.get(pedidoId);
                             
                             if (pedido != null && !pedido.isEmpty()) {
-                                String htmlContent = HtmlRes.generateTable(
+                                // Obtener los detalles de productos del pedido
+                                List<String[]> detallesPedido = nPedido.obtenerDetallePedido(pedidoId);
+                                
+                                // Generar HTML para la tabla principal del pedido
+                                String htmlPedido = HtmlRes.generateTable(
                                         "Detalles del Pedido #" + pedidoId,
                                         DPedido.HEADERS,
                                         pedido);
                                 
+                                // Generar HTML para los productos del pedido
+                                String htmlProductos = "";
+                                if (!detallesPedido.isEmpty()) {
+                                    htmlProductos = HtmlRes.generateTable(
+                                            "Productos en el Pedido #" + pedidoId,
+                                            DPedido.DETALLE_HEADERS,
+                                            detallesPedido);
+                                } else {
+                                    htmlProductos = "<p>No se encontraron productos asociados a este pedido.</p>";
+                                }
+                                
+                                // Combinar ambas tablas en un solo HTML
+                                String htmlContent = htmlPedido + "<br/><br/>" + htmlProductos;
+                                
+                                // Enviar respuesta con ambas tablas
                                 sendSimpleResponse(senderEmail, "📦 Detalles del Pedido #" + pedidoId, 
-                                        "Pedido #" + pedidoId + " encontrado. Revisa los detalles a continuación.", 
-                                        originalSubject, messageId);
+                                        htmlContent, originalSubject, messageId);
                             } else {
                                 sendSimpleResponse(senderEmail, "❌ Pedido no encontrado", 
                                         "No se encontró el pedido con ID: " + pedidoId, 
@@ -1574,23 +1599,54 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                             sendSimpleResponse(senderEmail, "❌ ID inválido", 
                                     "El ID del pedido debe ser un número. Formato: pedido get [id]", 
                                     originalSubject, messageId);
+                        } catch (SQLException e) {
+                            sendSimpleResponse(senderEmail, "❌ Error de base de datos", 
+                                    "Error consultando el pedido: " + e.getMessage(), 
+                                    originalSubject, messageId);
                         }
                     } else {
-                        // Listar todos los pedidos
-                        List<String[]> pedidos = dPedido.list();
-                        
-                        if (pedidos != null && !pedidos.isEmpty()) {
-                            String htmlContent = HtmlRes.generateTable(
-                                    "Lista de Pedidos",
-                                    DPedido.HEADERS,
-                                    pedidos);
+                        try {
+                            // Listar pedidos del cliente específico usando capa de negocio
+                            List<String[]> pedidos = nPedido.obtenerPedidosPorCliente(clienteId);
                             
-                            sendSimpleResponse(senderEmail, "📦 Lista de Pedidos", 
-                                    "Se encontraron " + pedidos.size() + " pedidos en el sistema.", 
-                                    originalSubject, messageId);
-                        } else {
-                            sendSimpleResponse(senderEmail, "📦 Sin pedidos", 
-                                    "No hay pedidos registrados en el sistema.", 
+                            if (pedidos != null && !pedidos.isEmpty()) {
+                                String htmlContent = HtmlRes.generateTable(
+                                        "Mis Pedidos - Cliente ID: " + clienteId,
+                                        DPedido.HEADERS,
+                                        pedidos);
+                                
+                                // Generar mensaje informativo
+                                StringBuilder mensaje = new StringBuilder();
+                                mensaje.append("Se encontraron ").append(pedidos.size()).append(" pedidos para tu cuenta.\n\n");
+                                
+                                // Revisar estado de pagos usando lógica de negocio
+                                boolean tienePendientes = nPedido.tienePedidosPendientes(clienteId);
+                                
+                                if (tienePendientes) {
+                                    mensaje.append("⚠️ ATENCIÓN: Tienes pedidos pendientes de pago.\n")
+                                          .append("Para completar el pago, usa el comando:\n")
+                                          .append("• pago [pedido_id] [tipo_pago_id]\n\n")
+                                          .append("Ver tipos de pago disponibles con: tipo_pago get\n\n");
+                                }
+                                
+                                mensaje.append("📋 Detalles de tus pedidos:");
+                                
+                                sendSimpleResponse(senderEmail, "📦 Mis Pedidos", 
+                                        mensaje.toString() + "\n\n" + htmlContent, 
+                                        originalSubject, messageId);
+                            } else {
+                                sendSimpleResponse(senderEmail, "📦 Sin pedidos", 
+                                        "No tienes pedidos registrados en tu cuenta.\n\n" +
+                                        "Para crear un pedido:\n" +
+                                        "1. Agrega productos al carrito: carrito add [producto_id] [cantidad]\n" +
+                                        "2. Crea el pedido: pedido add [direccion_id]\n" +
+                                        "3. Completa el pago: pago [pedido_id] [tipo_pago_id]", 
+                                        originalSubject, messageId);
+                            }
+                        } catch (SQLException e) {
+                            System.err.println("❌ Error de base de datos listando pedidos: " + e.getMessage());
+                            sendSimpleResponse(senderEmail, "❌ Error de base de datos", 
+                                    "Error consultando tus pedidos: " + e.getMessage(), 
                                     originalSubject, messageId);
                         }
                     }
@@ -1665,8 +1721,8 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                                 return;
                             }
                             
-                            // Crear pedido desde carrito
-                            int pedidoId = dPedido.crearPedidoDesdeCarrito(clienteId, direccionId);
+                            // Crear pedido desde carrito usando capa de negocio
+                            int pedidoId = nPedido.crearPedidoDesdeCarrito(clienteId, direccionId);
                             
                             if (pedidoId > 0) {
                                 sendSimpleResponse(senderEmail, "✅ Pedido Creado", 
@@ -1681,6 +1737,11 @@ public class EmailAppIndependiente implements ICasoUsoListener {
                                         "No se pudo crear el pedido. Verifica que tu carrito tenga productos válidos.",
                                         originalSubject, messageId);
                             }
+                        } catch (SQLException e) {
+                            System.err.println("❌ Error de base de datos en pedido add: " + e.getMessage());
+                            sendSimpleResponse(senderEmail, "❌ Error de base de datos", 
+                                    "Error procesando el pedido: " + e.getMessage(), 
+                                    originalSubject, messageId);
                         } catch (Exception e) {
                             System.err.println("❌ Error en pedido add: " + e.getMessage());
                             e.printStackTrace();
